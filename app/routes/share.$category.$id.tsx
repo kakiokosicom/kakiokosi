@@ -5,6 +5,7 @@ import type { Post, PostSummary } from "~/lib/db.server";
 import { formatArticleContent } from "~/lib/format-content";
 import { Icon } from "~/components/icon";
 import { imageSrcSet, imageSrc } from "~/lib/image";
+import { getAuthor, authorJsonLd } from "~/lib/authors";
 
 /** Generate a meta description from article HTML content when no excerpt exists. */
 function generateExcerpt(html: string, fallback: string): string {
@@ -82,8 +83,8 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
     { property: "og:url", content: url },
     { property: "og:site_name", content: "書き起こし.com" },
     { property: "og:locale", content: "ja_JP" },
-    { property: "og:image", content: post.thumbnail_url ? (post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}`) : "https://kakiokosi.com/images/default-og.svg" },
-    { name: "twitter:image", content: post.thumbnail_url ? (post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}`) : "https://kakiokosi.com/images/default-og.svg" },
+    { property: "og:image", content: post.thumbnail_url ? (post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}`) : "https://kakiokosi.com/images/default-og.png" },
+    { name: "twitter:image", content: post.thumbnail_url ? (post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}`) : "https://kakiokosi.com/images/default-og.png" },
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: post.title },
     { name: "twitter:description", content: description },
@@ -98,6 +99,7 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
 
 export default function ArticlePage({ loaderData }: Route.ComponentProps) {
   const { post, categories, tags, relatedPosts } = loaderData;
+  const author = getAuthor(post.author_id);
   const date = post.published_at
     ? new Date(post.published_at).toLocaleDateString("ja-JP")
     : "";
@@ -123,12 +125,8 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
         dateModified: (post.updated_at || post.published_at) ? (post.updated_at || post.published_at)!.replace(" ", "T") + "+09:00" : undefined,
         image: post.thumbnail_url
           ? { "@type": "ImageObject", url: post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}` }
-          : { "@type": "ImageObject", url: "https://kakiokosi.com/images/default-og.svg" },
-        author: {
-          "@type": "Person",
-          name: "書き起こし.com編集部",
-          url: "https://kakiokosi.com/share/about",
-        },
+          : { "@type": "ImageObject", url: "https://kakiokosi.com/images/default-og.png" },
+        author: authorJsonLd(getAuthor(post.author_id)),
         publisher: {
           "@id": "https://kakiokosi.com/#organization",
         },
@@ -202,7 +200,15 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
             )}
             <span className="w-1.5 h-1.5 rounded-full bg-outline-variant/30" />
             <span className="font-label text-xs text-on-surface-variant/70">
-              文字起こし: <Link to="/share/about" className="text-secondary no-underline hover:underline">書き起こし.com編集部</Link>
+              文字起こし: {author.url.startsWith("https://kakiokosi.com") ? (
+                <Link to={author.url.replace("https://kakiokosi.com", "")} className="text-secondary no-underline hover:underline">
+                  {author.nickname ? `${author.name}（${author.nickname}）` : author.name}
+                </Link>
+              ) : (
+                <a href={author.url} target="_blank" rel="noopener noreferrer" className="text-secondary no-underline hover:underline">
+                  {author.nickname ? `${author.name}（${author.nickname}）` : author.name}
+                </a>
+              )}
             </span>
           </div>
           <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-primary leading-[1.15] font-black mb-8">
@@ -235,29 +241,36 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
         />
 
         {/* Audio Players */}
-        {(post.voicy_url || post.spotify_url) && (
-          <div className="mt-12 p-6 bg-surface-container-low rounded-2xl">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-xl">🎙️</span>
-              <div>
-                <p className="text-sm font-medium text-primary">この記事の音声版</p>
-                <p className="text-xs text-on-surface-variant">音声でも聴くことができます</p>
+        {(() => {
+          const spotifyLink = post.spotify_url || "https://open.spotify.com/show/1Ut2cPgG7i2iK7d1p5BoXK";
+          const spotifyLabel = post.spotify_url ? "Spotifyで再生" : "Spotifyで番組を聴く";
+          const hasAudio = post.voicy_url || post.spotify_url;
+          return (
+            <div className="mt-12 p-6 bg-surface-container-low rounded-2xl">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-xl">🎙️</span>
+                <div>
+                  <p className="text-sm font-medium text-primary">
+                    {hasAudio ? "この記事の音声版" : "音声でも配信中"}
+                  </p>
+                  <p className="text-xs text-on-surface-variant">
+                    {hasAudio ? "音声でも聴くことができます" : "書き起こし.comのポッドキャストをチェック"}
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              {post.voicy_url && (
+              <div className="flex flex-wrap gap-3">
+                {post.voicy_url && (
+                  <a
+                    href={post.voicy_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FF6D3B] text-white rounded-full text-sm font-medium no-underline hover:bg-[#E55A2B] transition-colors"
+                  >
+                    ▶ Voicyで再生
+                  </a>
+                )}
                 <a
-                  href={post.voicy_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FF6D3B] text-white rounded-full text-sm font-medium no-underline hover:bg-[#E55A2B] transition-colors"
-                >
-                  ▶ Voicyで再生
-                </a>
-              )}
-              {post.spotify_url && (
-                <a
-                  href={post.spotify_url}
+                  href={spotifyLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1DB954] text-white rounded-full text-sm font-medium no-underline hover:bg-[#1aa34a] transition-colors"
@@ -265,12 +278,12 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
                   <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                     <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
                   </svg>
-                  Spotifyで再生
+                  {spotifyLabel}
                 </a>
-              )}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Tags */}
         {tags.length > 0 && (
