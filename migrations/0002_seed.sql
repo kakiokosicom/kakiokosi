@@ -31781,7 +31781,7 @@ INSERT INTO pages (id, slug, title, content, created_at, updated_at) VALUES (6, 
 <tbody>
 <tr>
 <th>社名</th>
-<td>株式会社ユリカ(英文名 YURICA Inc.)</td>
+<td>株式会社ユリカ(英文名 YURIKA,K.K.)</td>
 </tr>
 <tr>
 <th>設立</th>
