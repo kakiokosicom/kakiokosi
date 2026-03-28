@@ -5,13 +5,19 @@ import { PostCard } from "~/components/post-card";
 import { Pagination } from "~/components/pagination";
 
 export function meta() {
+  const description = "講演・インタ��ュー・スピー���の書き起こし記事を共有するサイト";
   return [
-    { title: "書き起こし.com" },
-    {
-      name: "description",
-      content:
-        "講演・インタビュー・スピーチの書き起こし記事を共有するサイト",
-    },
+    { title: "書き起こし.com — 書き起こし記事アーカイブ" },
+    { name: "description", content: description },
+    { tagName: "link", rel: "canonical", href: "https://kakiokosi.com/share" },
+    { property: "og:title", content: "書��起こし.com" },
+    { property: "og:description", content: description },
+    { property: "og:type", content: "website" },
+    { property: "og:url", content: "https://kakiokosi.com/share" },
+    { property: "og:site_name", content: "書き起こし.com" },
+    { name: "twitter:card", content: "summary" },
+    { name: "twitter:title", content: "��き起こし.com" },
+    { name: "twitter:description", content: description },
   ];
 }
 

@@ -5,6 +5,15 @@ import { PostCard } from "~/components/post-card";
 import { Pagination } from "~/components/pagination";
 
 const CATEGORY_LABELS: Record<string, string> = {
+  business: "ビジネス",
+  politics: "政治",
+  society: "社会",
+  world: "海外",
+  it: "IT",
+  entertainment: "��ンターテイメント",
+};
+
+const CATEGORY_LABELS_EN: Record<string, string> = {
   business: "Business",
   politics: "Politics",
   society: "Society",
@@ -30,15 +39,28 @@ export async function loader({ params, context }: Route.LoaderArgs) {
 
 export function meta({ data: loaderData }: Route.MetaArgs) {
   const name = loaderData?.category?.name ?? "";
+  const slug = loaderData?.category?.slug ?? "";
+  const description = `${name}カテゴリの書き起こ��記事一覧 — 講演・インタビュー・スピーチのテキスト`;
+  const url = `https://kakiokosi.com/share/category/${slug}`;
   return [
-    { title: `${name} | 書き起こし.com` },
-    { name: "description", content: `${name}カテゴリの書き起こし記事一覧` },
+    { title: `${name}の書き起こし記事一覧 | 書き起こし.com` },
+    { name: "description", content: description },
+    { tagName: "link", rel: "canonical", href: url },
+    { property: "og:title", content: `${name} | 書き起こし.com` },
+    { property: "og:description", content: description },
+    { property: "og:type", content: "website" },
+    { property: "og:url", content: url },
+    { property: "og:site_name", content: "書き起こし.com" },
+    { name: "twitter:card", content: "summary" },
+    { name: "twitter:title", content: `${name} | 書き起こし.com` },
+    { name: "twitter:description", content: description },
   ];
 }
 
 export default function CategoryPage({ loaderData }: Route.ComponentProps) {
   const { posts, totalPages, category, currentPage } = loaderData;
   const label = CATEGORY_LABELS[category.slug] ?? category.name;
+  const labelEn = CATEGORY_LABELS_EN[category.slug] ?? category.name;
   const featured = posts[0];
   const rest = posts.slice(1);
 
@@ -51,6 +73,7 @@ export default function CategoryPage({ loaderData }: Route.ComponentProps) {
         <h1 className="font-serif text-5xl md:text-7xl font-black text-primary tracking-tight">
           {label}
         </h1>
+        <p className="font-label text-sm text-on-surface-variant mt-2">{labelEn}</p>
         <div className="h-1 w-24 academic-gradient mt-6" />
       </header>
 

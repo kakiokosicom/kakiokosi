@@ -46,6 +46,29 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   return { user: result?.user ?? null };
 }
 
+const GLOBAL_JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      name: "書き起こし.com",
+      url: "https://kakiokosi.com",
+      description: "講演・インタビュー・スピーチの書き起こし記事を共有するサイト",
+      inLanguage: "ja",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: "https://kakiokosi.com/share?q={search_term_string}",
+        "query-input": "required name=search_term_string",
+      },
+    },
+    {
+      "@type": "Organization",
+      name: "書き起こし.com",
+      url: "https://kakiokosi.com",
+    },
+  ],
+};
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja">
@@ -55,6 +78,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta httpEquiv="Content-Security-Policy" content="upgrade-insecure-requests" />
         <Meta />
         <Links />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(GLOBAL_JSON_LD) }}
+        />
       </head>
       <body className="bg-surface text-on-surface font-sans">
         {children}
@@ -169,7 +196,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
           </div>
           <div className="h-[1px] w-1/4 bg-primary-container" />
           <p className="font-label text-[10px] uppercase tracking-widest text-white/40">
-            &copy; 2024 書き起こし.com. All rights reserved.
+            &copy; 2024–{new Date().getFullYear()} 書き起こし.com. All rights reserved.
           </p>
         </div>
       </footer>

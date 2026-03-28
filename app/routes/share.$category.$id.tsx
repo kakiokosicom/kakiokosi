@@ -207,7 +207,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
                   className="text-sm text-on-surface/70 hover:text-secondary transition-colors no-underline flex gap-3"
                 >
                   <span className="text-secondary/40">
-                    {CATEGORY_LABELS[cat.slug]?.[0] ?? "#"}
+                    {CATEGORY_LABELS_EN[cat.slug]?.[0] ?? "#"}
                   </span>
                   {cat.name}
                 </Link>

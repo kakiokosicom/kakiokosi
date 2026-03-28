@@ -5,6 +5,15 @@ import { PostCard } from "~/components/post-card";
 import { Pagination } from "~/components/pagination";
 
 const CATEGORY_LABELS: Record<string, string> = {
+  business: "ビジネス",
+  politics: "政治",
+  society: "社会",
+  world: "海外",
+  it: "IT",
+  entertainment: "エンターテイメント",
+};
+
+const CATEGORY_LABELS_EN: Record<string, string> = {
   business: "Business",
   politics: "Politics",
   society: "Society",
@@ -34,13 +43,26 @@ export async function loader({ params, context }: Route.LoaderArgs) {
 
 export function meta({ data: loaderData }: Route.MetaArgs) {
   const name = loaderData?.category?.name ?? "";
+  const slug = loaderData?.category?.slug ?? "";
   const page = loaderData?.currentPage ?? 1;
-  return [{ title: `${name} - ${page}ページ目 | 書き起こし.com` }];
+  const description = `${name}カテゴリの書き起こし記事一覧（${page}ページ目）`;
+  const url = `https://kakiokosi.com/share/category/${slug}/page/${page}`;
+  return [
+    { title: `${name}の書き起こし記事 - ${page}ページ目 | 書き起こし.com` },
+    { name: "description", content: description },
+    { tagName: "link", rel: "canonical", href: url },
+    { property: "og:title", content: `${name} - ${page}ページ目 | 書き起こし.com` },
+    { property: "og:description", content: description },
+    { property: "og:url", content: url },
+    { property: "og:site_name", content: "書き起こし.com" },
+    { name: "twitter:card", content: "summary" },
+  ];
 }
 
 export default function CategoryPagePaginated({ loaderData }: Route.ComponentProps) {
   const { posts, totalPages, category, currentPage } = loaderData;
   const label = CATEGORY_LABELS[category.slug] ?? category.name;
+  const labelEn = CATEGORY_LABELS_EN[category.slug] ?? category.name;
 
   return (
     <section className="max-w-5xl mx-auto">
@@ -52,7 +74,7 @@ export default function CategoryPagePaginated({ loaderData }: Route.ComponentPro
           {label}
         </h1>
         <span className="inline-block mt-2 font-label text-sm text-on-surface-variant">
-          Page {currentPage}
+          {labelEn} — {currentPage}ページ目
         </span>
         <div className="h-1 w-24 academic-gradient mt-6" />
       </header>

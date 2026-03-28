@@ -21,9 +21,21 @@ export async function loader({ params, context }: Route.LoaderArgs) {
 
 export function meta({ data: loaderData }: Route.MetaArgs) {
   const name = loaderData?.tag?.name ?? "";
+  const slug = loaderData?.tag?.slug ?? "";
+  const description = `「${name}」タグの書き���こし記事一覧 — 講演・インタビュー・スピーチのテキスト`;
+  const url = `https://kakiokosi.com/share/tag/${slug}`;
   return [
-    { title: `${name} | 書き起こし.com` },
-    { name: "description", content: `「${name}」タグの書き起こし記事一覧` },
+    { title: `${name}の書き起こし記事一覧 | 書き起こし.com` },
+    { name: "description", content: description },
+    { tagName: "link", rel: "canonical", href: url },
+    { property: "og:title", content: `${name} | 書き起こし.com` },
+    { property: "og:description", content: description },
+    { property: "og:type", content: "website" },
+    { property: "og:url", content: url },
+    { property: "og:site_name", content: "書き起こし.com" },
+    { name: "twitter:card", content: "summary" },
+    { name: "twitter:title", content: `${name} | 書き起こし.com` },
+    { name: "twitter:description", content: description },
   ];
 }
 

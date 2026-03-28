@@ -13,9 +13,40 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   return { page };
 }
 
-export function meta({ data: loaderData }: Route.MetaArgs) {
+const PAGE_DESCRIPTIONS: Record<string, string> = {
+  about: "書き起こし.comは、講演・インタビュー・スピーチの書き起こし記事を共有するサイトです。",
+  privacy: "書き起こし.comのプライバシーポリシー — 個人情報の取り扱いについて",
+  tos: "書き起こし.comの利用規約",
+  contact: "書き起こし.comへのお問い合わせ",
+  company: "書き起こし.comの運営情報",
+  regal: "書き起こし.comの特定商取引法に基づく表記",
+  technique: "書き起こしの技術・テクニックについて",
+  tapeokoshi: "テープ起こしの基本と方法について",
+  jirei: "書き起こしの事例紹介",
+  nagare: "書き起こしサービスのご利用の流れ",
+  omitsumori: "書き起こしサービスのお見積もりについて",
+  point: "書き起こしのポイント・コツ",
+  webmeeting: "Web会議の書き起こしについて",
+};
+
+export function meta({ data: loaderData, request }: Route.MetaArgs) {
   const title = loaderData?.page?.title ?? "ページ";
-  return [{ title: `${title} | 書き起こし.com` }];
+  const url = new URL(request.url);
+  const slug = url.pathname.replace(/^\/share\//, "").replace(/\/$/, "");
+  const description = PAGE_DESCRIPTIONS[slug] || `${title} — 書き起こし.com`;
+  return [
+    { title: `${title} | 書き起こし.com` },
+    { name: "description", content: description },
+    { tagName: "link", rel: "canonical", href: `https://kakiokosi.com${url.pathname}` },
+    { property: "og:title", content: `${title} | 書き起こし.com` },
+    { property: "og:description", content: description },
+    { property: "og:type", content: "website" },
+    { property: "og:url", content: `https://kakiokosi.com${url.pathname}` },
+    { property: "og:site_name", content: "書き起こし.com" },
+    { name: "twitter:card", content: "summary" },
+    { name: "twitter:title", content: `${title} | 書き起こし.com` },
+    { name: "twitter:description", content: description },
+  ];
 }
 
 export default function StaticPage({ loaderData }: Route.ComponentProps) {
