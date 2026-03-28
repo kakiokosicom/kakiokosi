@@ -295,6 +295,54 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
           </footer>
         )}
 
+        {/* Author Profile — show for audio-originated articles */}
+        {(post.voicy_url || post.spotify_url) && author.nickname && (
+          <section className="mt-16 p-8 bg-surface-container-low rounded-2xl">
+            <div className="flex items-start gap-6">
+              <div className="flex-shrink-0 w-16 h-16 rounded-full bg-primary-container flex items-center justify-center text-2xl font-serif font-black text-on-primary-container">
+                {author.name[0]}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <h3 className="font-serif text-xl font-bold text-primary">
+                    {author.name}（{author.nickname}）
+                  </h3>
+                  {author.nameReading && (
+                    <span className="text-xs text-on-surface-variant">{author.nameReading}</span>
+                  )}
+                </div>
+                <p className="mt-3 text-sm text-on-surface-variant leading-relaxed">
+                  {author.bio}
+                </p>
+                {author.sameAs.length > 0 && (
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    {author.sameAs.map((link) => {
+                      const label = link.includes("x.com") || link.includes("twitter.com")
+                        ? "X (Twitter)"
+                        : link.includes("note.com")
+                          ? "note"
+                          : link.includes("thekeyperson")
+                            ? "インタビュー"
+                            : "Web";
+                      return (
+                        <a
+                          key={link}
+                          href={link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs px-3 py-1.5 bg-surface-container text-secondary no-underline hover:bg-secondary-container transition-colors rounded-full"
+                        >
+                          {label}
+                        </a>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Related Articles */}
         {relatedPosts.length > 0 && (
           <section className="mt-20 pt-12 border-t border-outline-variant/20">
