@@ -1,0 +1,1 @@
+ALTER TABLE posts ADD COLUMN spotify_url TEXT DEFAULT NULL;
