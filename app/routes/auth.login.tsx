@@ -7,11 +7,16 @@ export function meta() {
 export default function LoginPage() {
   return (
     <div className="max-w-sm mx-auto mt-16">
-      <h1 className="text-2xl font-bold text-center mb-8">ログイン</h1>
+      <h1 className="font-serif text-3xl font-black text-primary text-center mb-2">
+        Login
+      </h1>
+      <p className="text-center text-on-surface-variant text-sm mb-10">
+        アカウントにログインして記事を投稿
+      </p>
       <div className="space-y-4">
         <a
           href="/auth/google"
-          className="flex items-center justify-center gap-3 w-full px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 no-underline text-gray-700"
+          className="flex items-center justify-center gap-3 w-full px-4 py-3 bg-surface-container-lowest text-primary no-underline hover:bg-surface-container-high transition-colors rounded-lg shadow-[0_2px_8px_rgb(26_28_27/0.06)]"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
@@ -23,7 +28,7 @@ export default function LoginPage() {
         </a>
         <a
           href="/auth/twitter"
-          className="flex items-center justify-center gap-3 w-full px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 no-underline text-gray-700"
+          className="flex items-center justify-center gap-3 w-full px-4 py-3 bg-surface-container-lowest text-primary no-underline hover:bg-surface-container-high transition-colors rounded-lg shadow-[0_2px_8px_rgb(26_28_27/0.06)]"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -31,8 +36,10 @@ export default function LoginPage() {
           X（Twitter）でログイン
         </a>
       </div>
-      <p className="mt-8 text-center text-sm text-gray-500">
-        <Link to="/share" className="text-gray-500 hover:text-gray-700">トップに戻る</Link>
+      <p className="mt-10 text-center text-sm text-on-surface-variant">
+        <Link to="/share" className="text-secondary hover:text-primary no-underline transition-colors">
+          トップに戻る
+        </Link>
       </p>
     </div>
   );
