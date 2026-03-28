@@ -43,9 +43,7 @@ export default [
   route("auth/login", "routes/auth.login.tsx"),
   route("auth/google", "routes/auth.google.tsx"),
   route("auth/google/callback", "routes/auth.google.callback.tsx"),
-  route("auth/twitter", "routes/auth.twitter.tsx"),
-  route("auth/twitter/callback", "routes/auth.twitter.callback.tsx"),
-  route("auth/logout", "routes/auth.logout.tsx"),
+route("auth/logout", "routes/auth.logout.tsx"),
 
   // Dashboard
   route("dashboard", "routes/dashboard._index.tsx"),
