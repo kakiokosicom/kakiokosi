@@ -12,8 +12,25 @@ export function formatArticleContent(html: string): string {
   // Normalize Windows \r\n and stray \r to \n
   content = content.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
 
-  // Wrap paragraphs if content lacks <p> tags
-  if (!/<p[\s>]/i.test(content)) {
+  // Clean up residual escaped backslashes from double-encoded JSON
+  content = content.replace(/\\+$/g, "");
+  content = content.replace(/\\"/g, '"');
+
+  // Rewrite legacy wp-content/uploads paths to /uploads/
+  content = content.replace(
+    /https?:\/\/(?:www\.)?kakiokosi\.com\/wp-content\/uploads\//g,
+    "/uploads/"
+  );
+  content = content.replace(/(?:\.\.\/)*wp-content\/uploads\//g, "/uploads/");
+
+  // Wrap paragraphs if the main body content lacks <p> tags.
+  // Strip editorial notes before checking — they may contain <p> internally
+  // but the rest of the article may still be unstructured plain text.
+  const bodyWithoutEditorialNotes = content.replace(
+    /<div class="editorial-note[^"]*">[\s\S]*?<\/div>/gi,
+    ""
+  );
+  if (!/<p[\s>]/i.test(bodyWithoutEditorialNotes)) {
     content = wrapParagraphs(content);
   }
 
@@ -25,30 +42,45 @@ export function formatArticleContent(html: string): string {
   return content;
 }
 
+/**
+ * Wraps plain text in <p> tags while preserving existing HTML elements.
+ * Strategy: split content on double-newlines (paragraph boundaries),
+ * then wrap each segment that isn't purely HTML tags.
+ */
 function wrapParagraphs(content: string): string {
-  const parts = content.split(/(<[^>]*>)/);
+  // Split on double newlines, preserving them
+  const segments = content.split(/(\n{2,})/);
+  const result: string[] = [];
 
-  const processed = parts.map((part, i) => {
-    if (i % 2 === 1) return part;
-    if (!part.trim()) return part;
+  for (const segment of segments) {
+    // Pure whitespace/newlines — skip
+    if (!segment.trim()) {
+      result.push(segment);
+      continue;
+    }
 
-    const blocks = part
-      .split(/\n{2,}/)
-      .map((b) => b.trim())
-      .filter((b) => b.length > 0);
+    // Check if this segment is purely block-level HTML (div, img, blockquote, etc.)
+    const stripped = segment.replace(/<[^>]+>/g, "").trim();
+    if (!stripped) {
+      // Only HTML tags, no text content — pass through
+      result.push(segment);
+      continue;
+    }
 
-    if (blocks.length === 1 && blocks[0].length < 80) return part;
+    // Check if it's already wrapped in a block element
+    const trimmed = segment.trim();
+    if (/^<(p|div|h[1-6]|blockquote|ul|ol|table|section|article|figure|nav)[\s>]/i.test(trimmed)) {
+      result.push(segment);
+      continue;
+    }
 
-    return (
-      "\n" +
-      blocks
-        .map((b) => `<p>${b.replace(/\n/g, "<br>")}</p>`)
-        .join("\n") +
-      "\n"
-    );
-  });
+    // This is a text segment (may contain inline HTML like <span>, <a>, <strong>, <br>)
+    // Wrap in <p>, converting single \n to <br>
+    const lines = trimmed.replace(/\n/g, "<br>");
+    result.push(`<p>${lines}</p>`);
+  }
 
-  return processed.join("");
+  return result.join("\n");
 }
 
 /**

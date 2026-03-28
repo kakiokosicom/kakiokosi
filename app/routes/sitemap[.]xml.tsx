@@ -17,9 +17,10 @@ export async function loader({ context }: Route.LoaderArgs) {
       .prepare(
         `SELECT c.slug, MAX(COALESCE(p.updated_at, p.published_at)) as lastmod
          FROM categories c
-         LEFT JOIN post_categories pc ON pc.category_slug = c.slug
-         LEFT JOIN posts p ON p.id = pc.post_id AND p.status = 'published'
-         GROUP BY c.slug`
+         JOIN post_categories pc ON pc.category_slug = c.slug
+         JOIN posts p ON p.id = pc.post_id AND p.status = 'published'
+         GROUP BY c.slug
+         HAVING COUNT(pc.post_id) >= 1`
       )
       .all<{ slug: string; lastmod: string | null }>(),
     db
@@ -36,8 +37,8 @@ export async function loader({ context }: Route.LoaderArgs) {
 
   const urls: string[] = [];
 
-  // Top page
-  urls.push(entry(baseUrl, "/share", posts.results[0]?.published_at));
+  // Top page — use most recent updated_at
+  urls.push(entry(baseUrl, "/share", posts.results[0]?.updated_at || posts.results[0]?.published_at));
 
   // Article pages
   for (const post of posts.results) {

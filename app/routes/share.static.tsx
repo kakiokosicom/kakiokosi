@@ -1,6 +1,8 @@
 import { data } from "react-router";
 import type { Route } from "./+types/share.static";
 import { getPage } from "~/lib/db.server";
+import { JsonLd } from "~/components/json-ld";
+import { breadcrumbSchema } from "~/lib/schema";
 
 export async function loader({ request, context }: Route.LoaderArgs) {
   const db = context.cloudflare.env.DB;
@@ -56,11 +58,38 @@ export function meta({ data: loaderData, location }: Route.MetaArgs) {
   ];
 }
 
+const PAGE_SCHEMA_TYPES: Record<string, string> = {
+  about: "AboutPage",
+  contact: "ContactPage",
+};
+
 export default function StaticPage({ loaderData }: Route.ComponentProps) {
   const { page } = loaderData;
+  const slug = page.slug;
+  const pageUrl = `https://kakiokosi.com/share/${slug}`;
+  const pageType = PAGE_SCHEMA_TYPES[slug] || "WebPage";
+
+  const pageSchema = {
+    "@context": "https://schema.org",
+    "@type": pageType,
+    name: page.title,
+    description: PAGE_DESCRIPTIONS[slug] || `${page.title} — 書き起こし.com`,
+    url: pageUrl,
+    inLanguage: "ja",
+    isPartOf: {
+      "@type": "WebSite",
+      name: "書き起こし.com",
+      url: "https://kakiokosi.com",
+    },
+  };
 
   return (
     <section className="max-w-3xl mx-auto">
+      <JsonLd data={pageSchema} />
+      <JsonLd data={breadcrumbSchema([
+        { name: "ホーム", url: "https://kakiokosi.com/share" },
+        { name: page.title, url: pageUrl },
+      ])} />
       <header className="mb-12">
         <h1 className="font-serif text-4xl font-black text-primary mb-4">
           {page.title}

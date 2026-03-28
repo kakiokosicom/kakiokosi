@@ -1,7 +1,7 @@
 import { data, redirect, Link } from "react-router";
 import type { Route } from "./+types/share.$category.$id";
 import { getPost, getRelatedPosts } from "~/lib/db.server";
-import type { Post } from "~/lib/db.server";
+import type { Post, PostSummary } from "~/lib/db.server";
 import { formatArticleContent } from "~/lib/format-content";
 import { Icon } from "~/components/icon";
 
@@ -61,8 +61,8 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
     { property: "og:url", content: url },
     { property: "og:site_name", content: "書き起こし.com" },
     { property: "og:locale", content: "ja_JP" },
-    { property: "og:image", content: post.thumbnail_url || "https://kakiokosi.com/images/default-og.svg" },
-    { name: "twitter:image", content: post.thumbnail_url || "https://kakiokosi.com/images/default-og.svg" },
+    { property: "og:image", content: post.thumbnail_url ? (post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}`) : "https://kakiokosi.com/images/default-og.svg" },
+    { name: "twitter:image", content: post.thumbnail_url ? (post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}`) : "https://kakiokosi.com/images/default-og.svg" },
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: post.title },
     { name: "twitter:description", content: description },
@@ -102,9 +102,9 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
         dateModified: (post.updated_at || post.published_at) ? (post.updated_at || post.published_at)!.replace(" ", "T") + "+09:00" : undefined,
         image: post.thumbnail_url
           ? { "@type": "ImageObject", url: post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}` }
-          : { "@type": "ImageObject", url: "https://kakiokosi.com/images/default-og.png" },
+          : { "@type": "ImageObject", url: "https://kakiokosi.com/images/default-og.svg" },
         author: {
-          "@type": "Person",
+          "@type": "Organization",
           name: "書き起こし.com編集部",
           url: "https://kakiokosi.com/share/about",
         },

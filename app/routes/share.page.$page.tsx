@@ -3,6 +3,8 @@ import type { Route } from "./+types/share.page.$page";
 import { getPublishedPosts, POSTS_PER_PAGE } from "~/lib/db.server";
 import { PostCard } from "~/components/post-card";
 import { Pagination } from "~/components/pagination";
+import { JsonLd } from "~/components/json-ld";
+import { collectionPageSchema } from "~/lib/schema";
 
 export async function loader({ params, context }: Route.LoaderArgs) {
   const db = context.cloudflare.env.DB;
@@ -32,10 +34,16 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
 }
 
 export default function SharePagePaginated({ loaderData }: Route.ComponentProps) {
-  const { posts, totalPages, currentPage } = loaderData;
+  const { posts, totalPages, currentPage, total } = loaderData;
 
   return (
     <section className="max-w-5xl mx-auto">
+      <JsonLd data={collectionPageSchema({
+        name: `書き起こし記事一覧 - ${currentPage}ページ目`,
+        description: `書き起こし記事アーカイブ（${currentPage}ページ目）`,
+        url: `https://kakiokosi.com/share/page/${currentPage}`,
+        numberOfItems: total,
+      })} />
       <header className="mb-16">
         <div className="inline-block bg-secondary-container px-3 py-1 text-[10px] font-bold tracking-[0.2em] text-on-secondary-container mb-4 uppercase">
           書き起こしアーカイブ

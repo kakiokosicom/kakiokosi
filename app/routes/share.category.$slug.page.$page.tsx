@@ -3,6 +3,8 @@ import type { Route } from "./+types/share.category.$slug.page.$page";
 import { getPostsByCategory, POSTS_PER_PAGE } from "~/lib/db.server";
 import { PostCard } from "~/components/post-card";
 import { Pagination } from "~/components/pagination";
+import { JsonLd } from "~/components/json-ld";
+import { collectionPageSchema } from "~/lib/schema";
 
 const CATEGORY_LABELS: Record<string, string> = {
   business: "ビジネス",
@@ -67,6 +69,12 @@ export default function CategoryPagePaginated({ loaderData }: Route.ComponentPro
 
   return (
     <section className="max-w-5xl mx-auto">
+      <JsonLd data={collectionPageSchema({
+        name: `${label}の書き起こし記事一覧 - ${currentPage}ページ目`,
+        description: `${label}カテゴリの書き起こし記事一覧（${currentPage}ページ目）`,
+        url: `https://kakiokosi.com/share/category/${category.slug}/page/${currentPage}`,
+        numberOfItems: loaderData.total,
+      })} />
       <header className="mb-16">
         <div className="inline-block bg-secondary-container px-3 py-1 text-[10px] font-bold tracking-[0.2em] text-on-secondary-container mb-4 uppercase">
           カテゴリ

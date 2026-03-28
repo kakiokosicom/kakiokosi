@@ -179,6 +179,16 @@ body {
   margin: 2rem 0;
 }
 
+/* Hide broken images gracefully */
+.article-content img[src]::after {
+  content: "";
+}
+
+.article-content img:not([src]),
+.article-content img[src=""] {
+  display: none;
+}
+
 .article-content ul,
 .article-content ol {
   margin: 1.5rem 0;

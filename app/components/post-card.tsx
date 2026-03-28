@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import type { Post } from "~/lib/db.server";
+import type { PostSummary } from "~/lib/db.server";
 
 const CATEGORY_LABELS: Record<string, string> = {
   business: "ビジネス",
@@ -10,7 +10,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   entertainment: "エンタメ",
 };
 
-export function PostCard({ post, featured }: { post: Post; featured?: boolean }) {
+export function PostCard({ post, featured }: { post: PostSummary; featured?: boolean }) {
   const date = post.published_at
     ? new Date(post.published_at).toLocaleDateString("ja-JP")
     : "";

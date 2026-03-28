@@ -22,12 +22,18 @@ export default {
 
     const url = new URL(request.url);
 
-    // Immutable cache for hashed static assets
-    if (url.pathname.startsWith("/assets/")) {
+    // Immutable cache for hashed static assets and uploaded images
+    if (url.pathname.startsWith("/assets/") || url.pathname.startsWith("/uploads/")) {
       response.headers.set(
         "Cache-Control",
         "public, max-age=31536000, immutable"
       );
+    }
+
+    // Ensure charset on HTML responses
+    const contentType = response.headers.get("Content-Type");
+    if (contentType && contentType.includes("text/html") && !contentType.includes("charset")) {
+      response.headers.set("Content-Type", "text/html; charset=utf-8");
     }
 
     // Security headers

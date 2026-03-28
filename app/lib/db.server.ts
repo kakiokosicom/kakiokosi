@@ -12,6 +12,9 @@ export type Post = {
   updated_at: string;
 };
 
+/** Post without content — for listing pages */
+export type PostSummary = Omit<Post, "content">;
+
 export type Category = {
   id: number;
   name: string;
@@ -33,18 +36,20 @@ export type Page = {
 
 const POSTS_PER_PAGE = 20;
 
+const LISTING_COLUMNS = `id, author_id, title, excerpt, status, primary_category, thumbnail_url, published_at, created_at, updated_at`;
+
 export async function getPublishedPosts(
   db: D1Database,
   page = 1
-): Promise<{ posts: Post[]; total: number }> {
+): Promise<{ posts: PostSummary[]; total: number }> {
   const offset = (page - 1) * POSTS_PER_PAGE;
   const [postsResult, countResult] = await Promise.all([
     db
       .prepare(
-        `SELECT * FROM posts WHERE status = 'published' ORDER BY published_at DESC LIMIT ? OFFSET ?`
+        `SELECT ${LISTING_COLUMNS} FROM posts WHERE status = 'published' ORDER BY published_at DESC LIMIT ? OFFSET ?`
       )
       .bind(POSTS_PER_PAGE, offset)
-      .all<Post>(),
+      .all<PostSummary>(),
     db
       .prepare(`SELECT COUNT(*) as count FROM posts WHERE status = 'published'`)
       .first<{ count: number }>(),
@@ -59,18 +64,19 @@ export async function getPostsByCategory(
   db: D1Database,
   categorySlug: string,
   page = 1
-): Promise<{ posts: Post[]; total: number; category: Category | null }> {
+): Promise<{ posts: PostSummary[]; total: number; category: Category | null }> {
   const offset = (page - 1) * POSTS_PER_PAGE;
+  const cols = LISTING_COLUMNS.split(", ").map((c) => `p.${c}`).join(", ");
   const [postsResult, countResult, category] = await Promise.all([
     db
       .prepare(
-        `SELECT p.* FROM posts p
+        `SELECT ${cols} FROM posts p
          JOIN post_categories pc ON p.id = pc.post_id
          WHERE pc.category_slug = ? AND p.status = 'published'
          ORDER BY p.published_at DESC LIMIT ? OFFSET ?`
       )
       .bind(categorySlug, POSTS_PER_PAGE, offset)
-      .all<Post>(),
+      .all<PostSummary>(),
     db
       .prepare(
         `SELECT COUNT(*) as count FROM posts p
@@ -95,18 +101,19 @@ export async function getPostsByTag(
   db: D1Database,
   tagSlug: string,
   page = 1
-): Promise<{ posts: Post[]; total: number; tag: Tag | null }> {
+): Promise<{ posts: PostSummary[]; total: number; tag: Tag | null }> {
   const offset = (page - 1) * POSTS_PER_PAGE;
+  const cols = LISTING_COLUMNS.split(", ").map((c) => `p.${c}`).join(", ");
   const [postsResult, countResult, tag] = await Promise.all([
     db
       .prepare(
-        `SELECT p.* FROM posts p
+        `SELECT ${cols} FROM posts p
          JOIN post_tags pt ON p.id = pt.post_id
          WHERE pt.tag_slug = ? AND p.status = 'published'
          ORDER BY p.published_at DESC LIMIT ? OFFSET ?`
       )
       .bind(tagSlug, POSTS_PER_PAGE, offset)
-      .all<Post>(),
+      .all<PostSummary>(),
     db
       .prepare(
         `SELECT COUNT(*) as count FROM posts p
@@ -188,16 +195,17 @@ export async function getRelatedPosts(
   postId: number,
   categorySlug: string,
   limit = 4
-): Promise<Post[]> {
+): Promise<PostSummary[]> {
+  const cols = LISTING_COLUMNS.split(", ").map((c) => `p.${c}`).join(", ");
   const result = await db
     .prepare(
-      `SELECT p.* FROM posts p
+      `SELECT ${cols} FROM posts p
        JOIN post_categories pc ON p.id = pc.post_id
        WHERE pc.category_slug = ? AND p.id != ? AND p.status = 'published'
        ORDER BY p.published_at DESC LIMIT ?`
     )
     .bind(categorySlug, postId, limit)
-    .all<Post>();
+    .all<PostSummary>();
   return result.results;
 }
 
