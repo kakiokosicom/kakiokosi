@@ -71,7 +71,9 @@ const GLOBAL_JSON_LD = {
       foundingDate: "2011",
       logo: {
         "@type": "ImageObject",
-        url: "https://kakiokosi.com/favicon.ico",
+        url: "https://kakiokosi.com/images/default-og.png",
+        width: 1200,
+        height: 630,
       },
       address: {
         "@type": "PostalAddress",
