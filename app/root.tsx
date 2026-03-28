@@ -103,6 +103,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(GLOBAL_JSON_LD) }}
         />
+        <script src="https://analytics.ahrefs.com/analytics.js" data-key="aaFaPDyRTwlvToTCpke9pg" async />
       </head>
       <body className="bg-surface text-on-surface font-sans">
         {children}
