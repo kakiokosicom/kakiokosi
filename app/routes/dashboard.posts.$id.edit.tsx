@@ -1,5 +1,5 @@
 import { Form, Link, useFetcher } from "react-router";
-import { useRef, useCallback, useEffect, useState } from "react";
+import { useRef, useCallback, useEffect, useState, lazy, Suspense } from "react";
 import type { Route } from "./+types/dashboard.posts.$id.edit";
 import { requireAuth } from "~/lib/require-auth.server";
 import {
@@ -95,12 +95,21 @@ export async function action({ request, params, context }: Route.ActionArgs) {
   return null;
 }
 
+const LazyEditor = lazy(() =>
+  import("~/components/editor/tiptap-editor").then((m) => ({
+    default: m.TiptapEditor,
+  }))
+);
+
 export default function EditPost({ loaderData }: Route.ComponentProps) {
   const { post, categories, user } = loaderData;
   const fetcher = useFetcher();
   const formRef = useRef<HTMLFormElement>(null);
   const [lastSaved, setLastSaved] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
   const isAdmin = user.role === "admin" || user.role === "editor";
+
+  useEffect(() => setIsClient(true), []);
 
   // Auto-save indicator
   useEffect(() => {
@@ -198,13 +207,25 @@ export default function EditPost({ loaderData }: Route.ComponentProps) {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             本文
           </label>
-          <textarea
-            name="content"
-            defaultValue={post.content}
-            rows={20}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm"
-            placeholder="記事の本文（HTML対応）"
-          />
+          {isClient ? (
+            <Suspense
+              fallback={
+                <div className="border border-gray-300 rounded-lg p-4 min-h-[400px] text-gray-400">
+                  エディタを読み込み中...
+                </div>
+              }
+            >
+              <LazyEditor content={post.content} name="content" />
+            </Suspense>
+          ) : (
+            <textarea
+              name="content"
+              defaultValue={post.content}
+              rows={20}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm"
+              placeholder="記事の本文（HTML対応）"
+            />
+          )}
         </div>
 
         <div className="flex gap-3 pt-4 border-t">

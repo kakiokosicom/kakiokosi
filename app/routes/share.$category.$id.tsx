@@ -3,6 +3,15 @@ import type { Route } from "./+types/share.$category.$id";
 import { getPost } from "~/lib/db.server";
 
 const CATEGORY_LABELS: Record<string, string> = {
+  business: "ビジネス",
+  politics: "政治",
+  society: "社会",
+  world: "海外",
+  it: "IT",
+  entertainment: "エンターテイメント",
+};
+
+const CATEGORY_LABELS_EN: Record<string, string> = {
   business: "Business",
   politics: "Politics",
   society: "Society",
@@ -35,14 +44,28 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
     return [{ title: "記事が見つかりません | 書き起こし.com" }];
   }
   const { post } = loaderData;
+  const url = `https://kakiokosi.com/share/${post.primary_category}/${post.id}`;
+  const description = post.excerpt || post.title;
   return [
     { title: `${post.title} | 書き起こし.com` },
-    { name: "description", content: post.excerpt || post.title },
+    { name: "description", content: description },
+    { tagName: "link", rel: "canonical", href: url },
     { property: "og:title", content: post.title },
-    { property: "og:description", content: post.excerpt || post.title },
+    { property: "og:description", content: description },
     { property: "og:type", content: "article" },
+    { property: "og:url", content: url },
+    { property: "og:site_name", content: "書き起こし.com" },
     ...(post.thumbnail_url
-      ? [{ property: "og:image", content: post.thumbnail_url }]
+      ? [
+          { property: "og:image", content: post.thumbnail_url },
+          { name: "twitter:image", content: post.thumbnail_url },
+        ]
+      : []),
+    { name: "twitter:card", content: post.thumbnail_url ? "summary_large_image" : "summary" },
+    { name: "twitter:title", content: post.title },
+    { name: "twitter:description", content: description },
+    ...(post.published_at
+      ? [{ property: "article:published_time", content: post.published_at }]
       : []),
   ];
 }
@@ -54,15 +77,64 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
     : "";
   const categoryLabel =
     CATEGORY_LABELS[post.primary_category] ?? post.primary_category;
+  const categoryLabelEn =
+    CATEGORY_LABELS_EN[post.primary_category] ?? post.primary_category;
+
+  const articleUrl = `https://kakiokosi.com/share/${post.primary_category}/${post.id}`;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Article",
+        headline: post.title,
+        description: post.excerpt || post.title,
+        url: articleUrl,
+        datePublished: post.published_at || undefined,
+        dateModified: post.updated_at || post.published_at || undefined,
+        ...(post.thumbnail_url ? { image: post.thumbnail_url } : {}),
+        publisher: {
+          "@type": "Organization",
+          name: "書き起こし.com",
+          url: "https://kakiokosi.com",
+        },
+        mainEntityOfPage: { "@type": "WebPage", "@id": articleUrl },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "ホーム", item: "https://kakiokosi.com/share" },
+          { "@type": "ListItem", position: 2, name: categoryLabel, item: `https://kakiokosi.com/share/category/${post.primary_category}` },
+          { "@type": "ListItem", position: 3, name: post.title },
+        ],
+      },
+    ],
+  };
 
   return (
     <div className="lg:flex gap-16 max-w-7xl mx-auto">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Article */}
       <article className="flex-1 max-w-3xl mx-auto lg:mx-0">
+        {/* Breadcrumb */}
+        <nav aria-label="パンくずリスト" className="mb-8 text-sm text-on-surface-variant">
+          <ol className="flex items-center gap-2 list-none p-0 m-0">
+            <li><Link to="/share" className="hover:text-secondary no-underline">ホー��</Link></li>
+            <li className="before:content-['/'] before:mx-2 before:text-outline-variant">
+              <Link to={`/share/category/${post.primary_category}`} className="hover:text-secondary no-underline">{categoryLabel}</Link>
+            </li>
+            <li className="before:content-['/'] before:mx-2 before:text-outline-variant text-on-surface truncate max-w-xs">
+              {post.title}
+            </li>
+          </ol>
+        </nav>
+
         <header className="mb-12">
           <div className="flex items-center gap-4 mb-6">
             <span className="font-label text-xs uppercase tracking-[0.2em] text-secondary font-bold">
-              {categoryLabel}
+              {categoryLabelEn}
             </span>
             <span className="w-1.5 h-1.5 rounded-full bg-outline-variant/30" />
             <time
@@ -79,7 +151,9 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
             <div className="aspect-[16/9] w-full overflow-hidden rounded-xl bg-surface-container mb-12">
               <img
                 src={post.thumbnail_url}
-                alt=""
+                alt={post.title}
+                width={800}
+                height={450}
                 className="w-full h-full object-cover"
               />
             </div>

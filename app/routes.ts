@@ -49,4 +49,9 @@ export default [
   route("dashboard/posts/new", "routes/dashboard.posts.new.tsx"),
   route("dashboard/posts/:id/edit", "routes/dashboard.posts.$id.edit.tsx"),
   route("dashboard/posts/:id/preview", "routes/dashboard.posts.$id.preview.tsx"),
+  // Admin
+  route("admin", "routes/admin._index.tsx"),
+  route("admin/review", "routes/admin.review.tsx"),
+  route("admin/users", "routes/admin.users.tsx"),
+  route("admin/posts", "routes/admin.posts.tsx"),
 ] satisfies RouteConfig;
