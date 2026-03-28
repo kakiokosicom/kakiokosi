@@ -253,7 +253,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
           </div>
           <div className="h-[1px] w-1/4 bg-primary-container" />
           <p className="font-label text-[10px] uppercase tracking-widest text-white/40">
-            &copy; 2024–{new Date().getFullYear()} 書き起こし.com. All rights reserved.
+            &copy; 2012–{new Date().getFullYear()} 書き起こし.com. All rights reserved.
           </p>
         </div>
       </footer>
