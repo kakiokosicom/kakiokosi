@@ -228,6 +228,34 @@ body {
   border-radius: 0.5rem;
 }
 
+/* Editorial notes (2026 content freshness update) */
+.editorial-note {
+  background: linear-gradient(135deg, #f6e1ae20, #f6e1ae10);
+  border-left: 3px solid #6c5d35;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: #43474d;
+}
+
+.editorial-note-footer {
+  margin-top: 2.5rem;
+  margin-bottom: 0;
+  border-left-color: #03192e;
+  background: linear-gradient(135deg, #03192e08, #03192e04);
+}
+
+.editorial-note strong {
+  color: #03192e;
+  font-weight: 700;
+}
+
+.editorial-note p {
+  margin: 0;
+}
+
 /* Static page content (legacy HTML from WP) */
 .static-content {
   line-height: 2;
