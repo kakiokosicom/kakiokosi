@@ -15,6 +15,7 @@ const AUTHORS: Record<string, Author> = {
     nickname: "パジ",
     bio: "連続起業家・現役スタートアップ経営者。2011年Tokyo Otaku Mode共同創業、海外2,000万人規模メディアから越境EC・翻訳・広告・配送代行まで自社一気通貫で推し活文化を世界に届ける。ゲーム攻略本ライター→Webディレクター→フリーエンジニアで起業、複数事業バイアウト経験。スタートアップとブロックチェーンに精通し、ゼロからの事業創出と新技術のかけ合わせを得意とする。最近のイチオシはAIバイブコーディング。",
     url: "https://note.com/hajimeataka",
+    avatarUrl: "/images/paji-avatar.jpg",
     sameAs: [
       "https://x.com/paji_a",
       "https://note.com/hajimeataka",

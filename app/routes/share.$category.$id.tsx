@@ -299,9 +299,20 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
         {(post.voicy_url || post.spotify_url) && author.nickname && (
           <section className="mt-16 p-8 bg-surface-container-low rounded-2xl">
             <div className="flex items-start gap-6">
-              <div className="flex-shrink-0 w-16 h-16 rounded-full bg-primary-container flex items-center justify-center text-2xl font-serif font-black text-on-primary-container">
-                {author.name[0]}
-              </div>
+              {author.avatarUrl ? (
+                <img
+                  src={author.avatarUrl}
+                  alt={author.nickname || author.name}
+                  width={64}
+                  height={64}
+                  className="flex-shrink-0 w-16 h-16 rounded-full object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-primary-container flex items-center justify-center text-2xl font-serif font-black text-on-primary-container">
+                  {author.name[0]}
+                </div>
+              )}
               <div className="flex-1 min-w-0">
                 <div className="flex items-baseline gap-2 flex-wrap">
                   <h3 className="font-serif text-xl font-bold text-primary">
