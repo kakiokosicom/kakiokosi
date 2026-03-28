@@ -264,8 +264,8 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
                   to={`/share/${related.primary_category}/${related.id}`}
                   className="group block no-underline"
                 >
-                  {related.thumbnail_url && (
-                    <div className="aspect-[16/10] mb-4 overflow-hidden bg-surface-container-high rounded-lg">
+                  <div className="aspect-[16/10] mb-4 overflow-hidden bg-surface-container-high rounded-lg">
+                    {related.thumbnail_url ? (
                       <img
                         src={imageSrc(related.thumbnail_url, 400)}
                         srcSet={imageSrcSet(related.thumbnail_url, [320, 400])}
@@ -276,8 +276,14 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         loading="lazy"
                       />
-                    </div>
-                  )}
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-surface-container text-on-surface-variant/30">
+                        <svg viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12">
+                          <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
                   <time className="text-[10px] text-on-surface-variant">
                     {related.published_at ? new Date(related.published_at).toLocaleDateString("ja-JP") : ""}
                   </time>
