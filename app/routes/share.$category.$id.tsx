@@ -6,6 +6,26 @@ import { formatArticleContent } from "~/lib/format-content";
 import { Icon } from "~/components/icon";
 import { imageSrcSet, imageSrc } from "~/lib/image";
 
+/** Generate a meta description from article HTML content when no excerpt exists. */
+function generateExcerpt(html: string, fallback: string): string {
+  const text = html
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (text.length < 30) return fallback;
+  // Find a good sentence boundary within 120-160 chars
+  const target = text.substring(0, 160);
+  const lastPeriod = target.lastIndexOf("。");
+  if (lastPeriod > 60) return target.substring(0, lastPeriod + 1);
+  const lastComma = target.lastIndexOf("、");
+  if (lastComma > 80) return target.substring(0, lastComma);
+  return target.substring(0, 140) + "…";
+}
+
 const CATEGORY_LABELS: Record<string, string> = {
   business: "ビジネス",
   politics: "政治",
@@ -51,7 +71,7 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
   }
   const { post } = loaderData;
   const url = `https://kakiokosi.com/share/${post.primary_category}/${post.id}`;
-  const description = post.excerpt || post.title;
+  const description = post.excerpt || generateExcerpt(post.content, post.title);
   return [
     { title: `${post.title} | 書き起こし.com` },
     { name: "description", content: description },
