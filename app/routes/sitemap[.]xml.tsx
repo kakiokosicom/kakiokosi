@@ -14,10 +14,21 @@ export async function loader({ context }: Route.LoaderArgs) {
       .prepare(`SELECT slug, updated_at FROM pages`)
       .all<{ slug: string; updated_at: string }>(),
     db
-      .prepare(`SELECT slug FROM categories`)
-      .all<{ slug: string }>(),
+      .prepare(
+        `SELECT c.slug, MAX(COALESCE(p.updated_at, p.published_at)) as lastmod
+         FROM categories c
+         LEFT JOIN post_categories pc ON pc.category_id = c.id
+         LEFT JOIN posts p ON p.id = pc.post_id AND p.status = 'published'
+         GROUP BY c.id`
+      )
+      .all<{ slug: string; lastmod: string | null }>(),
     db
-      .prepare(`SELECT slug FROM tags`)
+      .prepare(
+        `SELECT t.slug FROM tags t
+         JOIN post_tags pt ON pt.tag_id = t.id
+         GROUP BY t.id
+         HAVING COUNT(pt.post_id) >= 2`
+      )
       .all<{ slug: string }>(),
   ]);
 
@@ -34,7 +45,7 @@ export async function loader({ context }: Route.LoaderArgs) {
 
   // Category pages
   for (const cat of categories.results) {
-    urls.push(entry(baseUrl, `/share/category/${cat.slug}`, null));
+    urls.push(entry(baseUrl, `/share/category/${cat.slug}`, cat.lastmod ?? null));
   }
 
   // Tag pages

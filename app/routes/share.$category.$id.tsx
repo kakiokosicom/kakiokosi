@@ -145,7 +145,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
         </nav>
 
         <header className="mb-12">
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex items-center gap-4 mb-6 flex-wrap">
             <span className="font-label text-xs uppercase tracking-[0.2em] text-secondary font-bold">
               {categoryLabelEn}
             </span>
@@ -156,6 +156,10 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
             >
               {date}
             </time>
+            <span className="w-1.5 h-1.5 rounded-full bg-outline-variant/30" />
+            <span className="font-label text-xs text-on-surface-variant/70">
+              文字起こし: <Link to="/share/about" className="text-secondary no-underline hover:underline">書き起こし.com編集部</Link>
+            </span>
           </div>
           <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-primary leading-[1.15] font-black mb-8">
             {post.title}
