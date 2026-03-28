@@ -4,7 +4,10 @@ import { requireAuth } from "~/lib/require-auth.server";
 import { getUserPosts } from "~/lib/db-dashboard.server";
 
 export function meta() {
-  return [{ title: "ダッシュボード | 書き起こし.com" }];
+  return [
+    { title: "ダッシュボード | 書き起こし.com" },
+    { name: "robots", content: "noindex, nofollow" },
+  ];
 }
 
 export async function loader({ request, context }: Route.LoaderArgs) {

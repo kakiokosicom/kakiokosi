@@ -1,7 +1,10 @@
 import { Link } from "react-router";
 
 export function meta() {
-  return [{ title: "ログイン | 書き起こし.com" }];
+  return [
+    { title: "ログイン | 書き起こし.com" },
+    { name: "robots", content: "noindex, nofollow" },
+  ];
 }
 
 export default function LoginPage() {
