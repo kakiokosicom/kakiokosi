@@ -282,7 +282,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
           <div className="h-[1px] w-1/4 bg-primary-container" />
           <div className="text-center text-white/30 text-[10px] leading-relaxed">
             <p>運営: 株式会社ユリカ（YURIKA, K.K.）</p>
-            <p>〒150-0043 東京都渋谷区道��坂1丁目10番8号 渋谷道玄坂東急ビル2F-C</p>
+            <p>〒150-0043 東京都渋谷区道玄坂1丁目10番8号 渋谷道玄坂東急ビル2F-C</p>
           </div>
           <p className="font-label text-[10px] uppercase tracking-widest text-white/40">
             &copy; 2011–{new Date().getFullYear()} 書き起こし.com. All rights reserved.

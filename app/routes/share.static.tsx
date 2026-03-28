@@ -28,6 +28,7 @@ const PAGE_DESCRIPTIONS: Record<string, string> = {
   contact: "書き起こし.comへのお問い合わせ",
   company: "書き起こし.comの運営情報",
   regal: "書き起こし.comの特定商取引法に基づく表記",
+  "kakiokoshi-toha": "書き起こし（文字起こし）とは？意味・やり方・活用法をプロが徹底解説。講演・インタビュー・会議の音声をテキスト化する方法と、書き起こし.comの15年の実績に基づくノウハウを紹介します。",
   technique: "書き起こしの技術・テクニックについて",
   tapeokoshi: "テープ起こしの基本と方法について",
   jirei: "書き起こしの事例紹介",
@@ -65,6 +66,26 @@ const PAGE_SCHEMA_TYPES: Record<string, string> = {
   contact: "ContactPage",
 };
 
+/** FAQ items for the About page — maps to content sections */
+const ABOUT_FAQ_ITEMS = [
+  {
+    question: "書き起こし.comとは何ですか？",
+    answer: "書き起こし.comは、講演・インタビュー・スピーチなどの映像・音声コンテンツをテキスト化し、共有するためのプラットフォームです。2011年の開設以来、政治・ビジネス・社会・IT・エンターテインメントなど、幅広い分野の書き起こし記事を掲載しています。",
+  },
+  {
+    question: "書き起こし.comでは何ができますか？",
+    answer: "政治家の演説、経営者の講演、有識者のインタビューなど、143本以上の書き起こし記事を無料で閲覧できます。ビジネス・政治・社会・海外・IT・エンタメの6カテゴリから興味のあるテーマを見つけ、記事のURLをSNSやメールで簡単にシェアできます。",
+  },
+  {
+    question: "書き起こし.comはどんな人におすすめですか？",
+    answer: "電車内や職場など音を出しにくい環境でコンテンツを消化したい方、長時間の動画を効率よく斜め読みしたい方、重要な発言を正確にテキストで確認したい研究者・ジャーナリストの方、過去のスピーチや議論を資料として活用したい方におすすめです。",
+  },
+  {
+    question: "書き起こしの品質管理はどのように行っていますか？",
+    answer: "映像・音声を丁寧に聴き取り発言内容を忠実にテキスト化し、編集部員による校正を実施しています。出典の明示、著作権への配慮、中立性の維持を方針とし、読者からの誤字・聞き取り誤りのご指摘も歓迎しています。",
+  },
+];
+
 export default function StaticPage({ loaderData }: Route.ComponentProps) {
   const { page } = loaderData;
   const slug = page.slug;
@@ -85,9 +106,23 @@ export default function StaticPage({ loaderData }: Route.ComponentProps) {
     },
   };
 
+  const faqSchema = slug === "about" ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: ABOUT_FAQ_ITEMS.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  } : null;
+
   return (
     <section className="max-w-3xl mx-auto">
       <JsonLd data={pageSchema} />
+      {faqSchema && <JsonLd data={faqSchema} />}
       <JsonLd data={breadcrumbSchema([
         { name: "ホーム", url: "https://kakiokosi.com/share" },
         { name: page.title, url: pageUrl },

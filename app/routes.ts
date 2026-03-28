@@ -17,6 +17,7 @@ export default [
   route("share/regist", "routes/share.static.tsx", { id: "share-regist" }),
   route("share/technique", "routes/share.static.tsx", { id: "share-technique" }),
   route("share/webmeeting", "routes/share.static.tsx", { id: "share-webmeeting" }),
+  route("share/kakiokoshi-toha", "routes/share.static.tsx", { id: "share-kakiokoshi-toha" }),
   route("share/tapeokoshi", "routes/share.static.tsx", { id: "share-tapeokoshi" }),
   route("share/jirei", "routes/share.static.tsx", { id: "share-jirei" }),
   route("share/nagare", "routes/share.static.tsx", { id: "share-nagare" }),

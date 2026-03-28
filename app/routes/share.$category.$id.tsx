@@ -34,6 +34,9 @@ const CATEGORY_LABELS: Record<string, string> = {
   world: "海外",
   it: "IT",
   entertainment: "エンターテイメント",
+  economy: "経済・マネー",
+  culture: "カルチャー",
+  etc: "その他",
 };
 
 const CATEGORY_LABELS_EN: Record<string, string> = {
@@ -43,6 +46,9 @@ const CATEGORY_LABELS_EN: Record<string, string> = {
   world: "Foreign",
   it: "IT",
   entertainment: "Entertainment",
+  economy: "Economy",
+  culture: "Culture",
+  etc: "Other",
 };
 
 export async function loader({ params, context }: Route.LoaderArgs) {
@@ -233,6 +239,23 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
               {post.excerpt}
             </p>
           )}
+          {post.source_url && (
+            <div className="mb-12 text-sm text-on-surface-variant">
+              <span>元の映像・音声: </span>
+              <a
+                href={post.source_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-secondary no-underline hover:underline"
+              >
+                {post.source_url.includes("youtube") || post.source_url.includes("youtu.be")
+                  ? "YouTubeで視聴"
+                  : post.source_url.includes("ted.com")
+                    ? "TEDで視聴"
+                    : "元ソースを見る"}
+              </a>
+            </div>
+          )}
         </header>
 
         <div
@@ -295,8 +318,8 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
           </footer>
         )}
 
-        {/* Author Profile — show for audio-originated articles */}
-        {(post.voicy_url || post.spotify_url) && author.nickname && (
+        {/* Author Profile */}
+        {author.nickname && (
           <section className="mt-16 p-8 bg-surface-container-low rounded-2xl">
             <div className="flex items-start gap-6">
               {author.avatarUrl ? (

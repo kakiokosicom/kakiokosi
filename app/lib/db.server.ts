@@ -9,6 +9,7 @@ export type Post = {
   thumbnail_url: string | null;
   voicy_url: string | null;
   spotify_url: string | null;
+  source_url: string | null;
   published_at: string | null;
   created_at: string;
   updated_at: string;

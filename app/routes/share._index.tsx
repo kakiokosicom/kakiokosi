@@ -35,8 +35,8 @@ export async function loader({ context }: Route.LoaderArgs) {
 
 export default function ShareIndex({ loaderData }: Route.ComponentProps) {
   const { posts, totalPages, total } = loaderData;
-  // Prefer a post with thumbnail as the featured card for visual impact
-  const featuredIdx = posts.findIndex((p) => p.thumbnail_url);
+  // Prefer a recent post with thumbnail as the featured card (within first 5)
+  const featuredIdx = posts.slice(0, 5).findIndex((p) => p.thumbnail_url);
   const featured = featuredIdx >= 0 ? posts[featuredIdx] : posts[0];
   const rest = posts.filter((_, i) => i !== (featuredIdx >= 0 ? featuredIdx : 0));
 
@@ -56,9 +56,11 @@ export default function ShareIndex({ loaderData }: Route.ComponentProps) {
           書き起こし記事一覧
         </h1>
         <p className="mt-6 text-on-surface-variant text-base md:text-lg leading-relaxed max-w-2xl">
-          講演・インタビュー・スピーチの書き起こし記事を掲載しています。
-          ビジネス、政治、社会、IT、エンターテイメントなど幅広いジャンルの
-          トークを文字で読むことができます。
+          書き起こし.comは、2011年から運営している講演・インタビュー・スピーチの
+          書き起こし専門メディアです。ビジネス、政治、社会、IT、エンターテイメントなど
+          幅広いジャンルのトークを正確に文字に起こし、{total}本以上の記事として
+          アーカイブしています。話し手の言葉をそのまま伝えることで、
+          動画や音声では見つけにくい情報を検索・引用しやすい形で提供しています。
         </p>
         <div className="h-1 w-24 academic-gradient mt-6" />
       </header>

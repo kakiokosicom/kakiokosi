@@ -26,12 +26,14 @@ const AUTHORS: Record<string, Author> = {
 
 /** Default author for legacy articles without a specific author */
 const DEFAULT_AUTHOR: Author = {
-  name: "書き起こし.com編集部",
+  name: "書き起こし.com",
   nameReading: "",
-  nickname: "",
-  bio: "講演・インタビュー・スピーチの書き起こし記事を制作・編集しています。",
+  nickname: "編集部",
+  bio: "2011年から講演・インタビュー・スピーチの書き起こし記事を制作・編集しています。ビジネス、政治、社会、IT、エンターテイメントなど幅広いジャンルのトークを正確に文字に起こし、知識として共有しています。",
   url: "https://kakiokosi.com/share/about",
-  sameAs: [],
+  sameAs: [
+    "https://x.com/paji_a",
+  ],
 };
 
 /**

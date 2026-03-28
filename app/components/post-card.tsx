@@ -2,6 +2,18 @@ import { Link } from "react-router";
 import type { PostSummary } from "~/lib/db.server";
 import { imageSrcSet, imageSrc } from "~/lib/image";
 
+const CATEGORY_ICONS: Record<string, string> = {
+  business: "💼",
+  politics: "🏛️",
+  society: "🌐",
+  world: "✈️",
+  it: "💻",
+  entertainment: "🎭",
+  economy: "💰",
+  culture: "🎨",
+  etc: "📝",
+};
+
 const CATEGORY_LABELS: Record<string, string> = {
   business: "ビジネス",
   politics: "政治",
@@ -9,6 +21,9 @@ const CATEGORY_LABELS: Record<string, string> = {
   world: "海外",
   it: "IT",
   entertainment: "エンタメ",
+  economy: "経済・マネー",
+  culture: "カルチャー",
+  etc: "その他",
 };
 
 export function PostCard({ post, featured }: { post: PostSummary; featured?: boolean }) {
@@ -25,8 +40,8 @@ export function PostCard({ post, featured }: { post: PostSummary; featured?: boo
           className="block no-underline"
         >
           <div className="flex flex-col lg:flex-row gap-10">
-            {post.thumbnail_url && (
-              <div className="lg:w-3/5 overflow-hidden aspect-[16/9] bg-surface-container-high">
+            <div className="lg:w-3/5 overflow-hidden aspect-[16/9] bg-surface-container-high">
+              {post.thumbnail_url ? (
                 <img
                   src={imageSrc(post.thumbnail_url, 640)}
                   srcSet={imageSrcSet(post.thumbnail_url, [320, 640, 960])}
@@ -38,9 +53,13 @@ export function PostCard({ post, featured }: { post: PostSummary; featured?: boo
                   loading="eager"
                   fetchPriority="high"
                 />
-              </div>
-            )}
-            <div className={`${post.thumbnail_url ? "lg:w-2/5" : ""} flex flex-col justify-center`}>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-primary-container/20">
+                  <span className="text-6xl">{CATEGORY_ICONS[post.primary_category] || "📝"}</span>
+                </div>
+              )}
+            </div>
+            <div className="lg:w-2/5 flex flex-col justify-center">
               <div className="flex items-center gap-4 mb-4">
                 <span className="font-label text-xs font-bold text-secondary tracking-widest uppercase">
                   {categoryLabel}
@@ -72,8 +91,8 @@ export function PostCard({ post, featured }: { post: PostSummary; featured?: boo
         to={`/share/${post.primary_category}/${post.id}`}
         className="block no-underline"
       >
-        {post.thumbnail_url && (
-          <div className="aspect-[16/10] mb-6 overflow-hidden bg-surface-container-high">
+        <div className="aspect-[16/10] mb-6 overflow-hidden bg-surface-container-high">
+          {post.thumbnail_url ? (
             <img
               src={imageSrc(post.thumbnail_url, 400)}
               srcSet={imageSrcSet(post.thumbnail_url, [320, 400, 640])}
@@ -84,8 +103,12 @@ export function PostCard({ post, featured }: { post: PostSummary; featured?: boo
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               loading="lazy"
             />
-          </div>
-        )}
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-primary-container/20">
+              <span className="text-4xl">{CATEGORY_ICONS[post.primary_category] || "📝"}</span>
+            </div>
+          )}
+        </div>
         <div className="flex items-center gap-4 mb-3">
           <span className="font-label text-[10px] font-bold text-secondary tracking-widest uppercase">
             {categoryLabel}
