@@ -35,18 +35,18 @@ const DEFAULT_AUTHOR: Author = {
 };
 
 /**
- * Get author by user ID. Falls back to editorial team.
- * Maps known author_id values to their profiles.
+ * Get author for a post. Uses author_id first, then falls back to
+ * detecting audio-originated posts (voicy_url) as paji's content.
  */
-export function getAuthor(authorId: string | null): Author {
-  if (!authorId) return DEFAULT_AUTHOR;
+export function getAuthor(authorId: string | null, hasAudioUrl = false): Author {
+  if (authorId) {
+    // Any registered author_id maps to paji (site owner) for now
+    return AUTHORS.paji;
+  }
 
-  // Map DB author_id to author key
-  // Add mappings here as authors are registered
-  for (const [, author] of Object.entries(AUTHORS)) {
-    // Match by checking if the authorId corresponds to a known author
-    // For now, any non-null author_id maps to paji (site owner)
-    return author;
+  // Posts with voicy_url are paji's audio-originated content
+  if (hasAudioUrl) {
+    return AUTHORS.paji;
   }
 
   return DEFAULT_AUTHOR;

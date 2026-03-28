@@ -99,7 +99,7 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
 
 export default function ArticlePage({ loaderData }: Route.ComponentProps) {
   const { post, categories, tags, relatedPosts } = loaderData;
-  const author = getAuthor(post.author_id);
+  const author = getAuthor(post.author_id, !!(post.voicy_url || post.spotify_url));
   const date = post.published_at
     ? new Date(post.published_at).toLocaleDateString("ja-JP")
     : "";
@@ -126,7 +126,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
         image: post.thumbnail_url
           ? { "@type": "ImageObject", url: post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}` }
           : { "@type": "ImageObject", url: "https://kakiokosi.com/images/default-og.png" },
-        author: authorJsonLd(getAuthor(post.author_id)),
+        author: authorJsonLd(getAuthor(post.author_id, !!(post.voicy_url || post.spotify_url))),
         publisher: {
           "@id": "https://kakiokosi.com/#organization",
         },
