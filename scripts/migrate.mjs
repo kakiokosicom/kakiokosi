@@ -171,6 +171,9 @@ function parseRow(rowStr) {
       } else if (next === "0") {
         current += "\0";
         i++;
+      } else if (next === '"') {
+        current += '"';
+        i++;
       } else {
         current += ch;
       }
