@@ -38,10 +38,10 @@ export default function SharePagePaginated({ loaderData }: Route.ComponentProps)
     <section className="max-w-5xl mx-auto">
       <header className="mb-16">
         <div className="inline-block bg-secondary-container px-3 py-1 text-[10px] font-bold tracking-[0.2em] text-on-secondary-container mb-4 uppercase">
-          Latest Transcripts
+          書き起こしアーカイブ
         </div>
         <h1 className="font-serif text-5xl md:text-7xl font-black text-primary tracking-tight">
-          Archives
+          書き起こし記事一覧
         </h1>
         <span className="inline-block mt-2 font-label text-sm text-on-surface-variant">
           {currentPage}ページ目

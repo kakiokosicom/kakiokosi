@@ -80,6 +80,10 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
   const date = post.published_at
     ? new Date(post.published_at).toLocaleDateString("ja-JP")
     : "";
+  const updatedDate = post.updated_at
+    ? new Date(post.updated_at).toLocaleDateString("ja-JP")
+    : "";
+  const showUpdated = updatedDate && updatedDate !== date;
   const categoryLabel =
     CATEGORY_LABELS[post.primary_category] ?? post.primary_category;
   const categoryLabelEn =
@@ -98,9 +102,9 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
         dateModified: (post.updated_at || post.published_at)?.replace(" ", "T") || undefined,
         ...(post.thumbnail_url ? { image: post.thumbnail_url } : {}),
         author: {
-          "@type": "Organization",
-          name: "書き起こし.com",
-          url: "https://kakiokosi.com",
+          "@type": "Person",
+          name: "書き起こし.com編集部",
+          url: "https://kakiokosi.com/share/about",
         },
         publisher: {
           "@type": "Organization",
@@ -160,6 +164,17 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
             >
               {date}
             </time>
+            {showUpdated && (
+              <>
+                <span className="w-1.5 h-1.5 rounded-full bg-outline-variant/30" />
+                <time
+                  className="font-label text-xs text-secondary/80"
+                  dateTime={post.updated_at ?? ""}
+                >
+                  更新: {updatedDate}
+                </time>
+              </>
+            )}
             <span className="w-1.5 h-1.5 rounded-full bg-outline-variant/30" />
             <span className="font-label text-xs text-on-surface-variant/70">
               文字起こし: <Link to="/share/about" className="text-secondary no-underline hover:underline">書き起こし.com編集部</Link>
@@ -272,27 +287,22 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
             </nav>
           </div>
 
-          {/* Newsletter CTA */}
+          {/* About */}
           <div className="p-8 bg-primary-container text-white rounded-xl relative overflow-hidden">
             <span className="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl opacity-10">
-              mail
+              auto_stories
             </span>
-            <h3 className="font-serif text-xl mb-2">Newsletter</h3>
-            <p className="text-xs text-on-primary-container mb-6">
-              深みのある思考を、あなたのインボックスへ。
+            <h3 className="font-serif text-xl mb-2">書き起こし.comとは</h3>
+            <p className="text-xs text-on-primary-container mb-6 leading-relaxed">
+              2011年から講演・スピーチ・インタビューを文字に起こし、知識として共有しています。
             </p>
-            <div className="relative">
-              <input
-                className="w-full bg-primary border-none rounded-lg py-2 pl-4 pr-10 text-xs text-white placeholder:text-white/40 focus:ring-1 focus:ring-secondary focus:outline-none"
-                placeholder="Email Address"
-                type="email"
-              />
-              <button className="absolute right-2 top-1/2 -translate-y-1/2 text-secondary">
-                <span className="material-symbols-outlined">
-                  arrow_forward
-                </span>
-              </button>
-            </div>
+            <Link
+              to="/share/about"
+              className="inline-flex items-center gap-2 text-xs font-bold text-secondary no-underline hover:underline"
+            >
+              詳しく見る
+              <span className="material-symbols-outlined text-sm">arrow_forward</span>
+            </Link>
           </div>
         </div>
       </aside>

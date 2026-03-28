@@ -3,6 +3,8 @@ import type { Route } from "./+types/share.tag.$slug";
 import { getPostsByTag, POSTS_PER_PAGE } from "~/lib/db.server";
 import { PostCard } from "~/components/post-card";
 import { Pagination } from "~/components/pagination";
+import { JsonLd } from "~/components/json-ld";
+import { collectionPageSchema } from "~/lib/schema";
 
 export async function loader({ params, context }: Route.LoaderArgs) {
   const db = context.cloudflare.env.DB;
@@ -45,9 +47,14 @@ export default function TagPage({ loaderData }: Route.ComponentProps) {
 
   return (
     <section className="max-w-5xl mx-auto">
+      <JsonLd data={collectionPageSchema({
+        name: `${tag.name}の書き起こし記事一覧`,
+        description: `「${tag.name}」タグの書き起こし記事一覧`,
+        url: `https://kakiokosi.com/share/tag/${tag.slug}`,
+      })} />
       <header className="mb-16">
         <div className="inline-block bg-secondary-container px-3 py-1 text-[10px] font-bold tracking-[0.2em] text-on-secondary-container mb-4 uppercase">
-          Archive / Tag
+          タグ
         </div>
         <h1 className="font-serif text-5xl md:text-7xl font-black text-primary tracking-tight">
           {tag.name}

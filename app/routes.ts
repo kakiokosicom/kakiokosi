@@ -36,6 +36,10 @@ export default [
   // Article page (must be after static pages to avoid conflicts)
   route("share/:category/:id", "routes/share.$category.$id.tsx"),
 
+  // RSS Feeds
+  route("share/feed.xml", "routes/share.feed[.]xml.tsx"),
+  route("share/category/:slug/feed.xml", "routes/share.category.$slug.feed[.]xml.tsx"),
+
   // Sitemap
   route("sitemap.xml", "routes/sitemap[.]xml.tsx"),
 

@@ -23,6 +23,18 @@ export function organizationSchema() {
     url: SITE_URL,
     logo: LOGO_URL,
     description: SITE_DESCRIPTION,
+    foundingDate: "2011",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "東京都",
+      addressCountry: "JP",
+    },
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer service",
+      email: "info@kakiokosi.com",
+      availableLanguage: "Japanese",
+    },
     sameAs: [],
   };
 }
@@ -121,6 +133,11 @@ export function articleSchema(
       "@id": opts.url,
     },
     inLanguage: "ja",
+    author: {
+      "@type": "Person",
+      name: "書き起こし.com編集部",
+      url: `${SITE_URL}/share/about`,
+    },
     publisher: {
       "@type": "Organization",
       name: SITE_NAME,

@@ -39,6 +39,12 @@ export const links: Route.LinksFunction = () => [
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@24,400,0&display=swap",
   },
+  {
+    rel: "alternate",
+    type: "application/rss+xml",
+    title: "書き起こし.com RSS",
+    href: "https://kakiokosi.com/share/feed.xml",
+  },
 ];
 
 export async function loader({ request, context }: Route.LoaderArgs) {
@@ -65,9 +71,21 @@ const GLOBAL_JSON_LD = {
       url: "https://kakiokosi.com",
       description:
         "講演・インタビュー・スピーチの書き起こし記事を共有するサイト",
+      foundingDate: "2011",
       logo: {
         "@type": "ImageObject",
         url: "https://kakiokosi.com/favicon.ico",
+      },
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "東京都",
+        addressCountry: "JP",
+      },
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer service",
+        email: "info@kakiokosi.com",
+        availableLanguage: "Japanese",
       },
     },
   ],

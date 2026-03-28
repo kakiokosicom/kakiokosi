@@ -53,7 +53,7 @@ export function PostCard({ post, featured }: { post: Post; featured?: boolean })
                 </p>
               )}
               <span className="text-xs font-bold text-primary flex items-center gap-2">
-                READ THE TRANSCRIPT
+                書き起こしを読む
                 <span className="h-[1px] w-8 bg-secondary group-hover:w-12 transition-all" />
               </span>
             </div>

@@ -69,7 +69,7 @@ export default function CategoryPagePaginated({ loaderData }: Route.ComponentPro
     <section className="max-w-5xl mx-auto">
       <header className="mb-16">
         <div className="inline-block bg-secondary-container px-3 py-1 text-[10px] font-bold tracking-[0.2em] text-on-secondary-container mb-4 uppercase">
-          Archive / Category
+          カテゴリ
         </div>
         <h1 className="font-serif text-5xl md:text-7xl font-black text-primary tracking-tight">
           {label}

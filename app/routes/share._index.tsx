@@ -3,6 +3,8 @@ import type { Route } from "./+types/share._index";
 import { getPublishedPosts, POSTS_PER_PAGE } from "~/lib/db.server";
 import { PostCard } from "~/components/post-card";
 import { Pagination } from "~/components/pagination";
+import { JsonLd } from "~/components/json-ld";
+import { collectionPageSchema } from "~/lib/schema";
 
 export function meta() {
   const description =
@@ -36,9 +38,14 @@ export default function ShareIndex({ loaderData }: Route.ComponentProps) {
 
   return (
     <section className="max-w-5xl mx-auto">
+      <JsonLd data={collectionPageSchema({
+        name: "書き起こし記事一覧",
+        description: "講演・インタビュー・スピーチの書き起こし記事を共有するサイト",
+        url: "https://kakiokosi.com/share",
+      })} />
       <header className="mb-16">
         <div className="inline-block bg-secondary-container px-3 py-1 text-[10px] font-bold tracking-[0.2em] text-on-secondary-container mb-4 uppercase">
-          Transcripts Archive
+          書き起こしアーカイブ
         </div>
         <h1 className="font-serif text-4xl md:text-6xl font-black text-primary tracking-tight">
           書き起こし記事一覧

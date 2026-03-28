@@ -4,4 +4,24 @@ Disallow: /auth/
 Disallow: /dashboard/
 Disallow: /admin/
 
+User-agent: GPTBot
+Allow: /share/
+Disallow: /auth/
+Disallow: /dashboard/
+
+User-agent: ClaudeBot
+Allow: /share/
+Disallow: /auth/
+Disallow: /dashboard/
+
+User-agent: Google-Extended
+Allow: /share/
+Disallow: /auth/
+Disallow: /dashboard/
+
+User-agent: PerplexityBot
+Allow: /share/
+Disallow: /auth/
+Disallow: /dashboard/
+
 Sitemap: https://kakiokosi.com/sitemap.xml

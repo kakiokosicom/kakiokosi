@@ -3,6 +3,8 @@ import type { Route } from "./+types/share.category.$slug";
 import { getPostsByCategory, POSTS_PER_PAGE } from "~/lib/db.server";
 import { PostCard } from "~/components/post-card";
 import { Pagination } from "~/components/pagination";
+import { JsonLd } from "~/components/json-ld";
+import { collectionPageSchema } from "~/lib/schema";
 
 const CATEGORY_LABELS: Record<string, string> = {
   business: "ビジネス",
@@ -76,9 +78,14 @@ export default function CategoryPage({ loaderData }: Route.ComponentProps) {
 
   return (
     <section className="max-w-5xl mx-auto">
+      <JsonLd data={collectionPageSchema({
+        name: `${label}の書き起こし記事一覧`,
+        description: CATEGORY_DESCRIPTIONS[category.slug] || `${label}カテゴリの書き起こし記事一覧`,
+        url: `https://kakiokosi.com/share/category/${category.slug}`,
+      })} />
       <header className="mb-16">
         <div className="inline-block bg-secondary-container px-3 py-1 text-[10px] font-bold tracking-[0.2em] text-on-secondary-container mb-4 uppercase">
-          Archive / Category
+          カテゴリ
         </div>
         <h1 className="font-serif text-5xl md:text-7xl font-black text-primary tracking-tight">
           {label}
