@@ -31,23 +31,34 @@ export default function TagPage({ loaderData }: Route.ComponentProps) {
   const { posts, totalPages, tag, currentPage } = loaderData;
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">
-        タグ: {tag.name}
-      </h1>
-      <div>
+    <section className="max-w-5xl mx-auto">
+      <header className="mb-16">
+        <div className="inline-block bg-secondary-container px-3 py-1 text-[10px] font-bold tracking-[0.2em] text-on-secondary-container mb-4 uppercase">
+          Archive / Tag
+        </div>
+        <h1 className="font-serif text-5xl md:text-7xl font-black text-primary tracking-tight">
+          {tag.name}
+        </h1>
+        <div className="h-1 w-24 academic-gradient mt-6" />
+      </header>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">
         {posts.map((post) => (
           <PostCard key={post.id} post={post} />
         ))}
       </div>
+
       {posts.length === 0 && (
-        <p className="text-gray-500 py-8 text-center">このタグの記事はまだありません。</p>
+        <p className="text-on-surface-variant py-16 text-center text-lg">
+          このタグの記事はまだありません。
+        </p>
       )}
+
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
         baseUrl={`/share/tag/${tag.slug}`}
       />
-    </div>
+    </section>
   );
 }

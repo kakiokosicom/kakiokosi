@@ -19,28 +19,29 @@ export function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps
   }
 
   return (
-    <nav className="flex justify-center gap-2 mt-8" aria-label="ページネーション">
+    <nav className="mt-24 flex items-center justify-center gap-4" aria-label="ページネーション">
       {currentPage > 1 && (
         <Link
           to={currentPage === 2 ? baseUrl : `${baseUrl}/page/${currentPage - 1}`}
-          className="px-3 py-2 text-sm border rounded hover:bg-gray-50 no-underline text-gray-700"
+          className="flex items-center gap-2 px-6 py-2 bg-surface-container-high text-primary hover:bg-primary hover:text-on-primary transition-all font-bold text-xs tracking-widest uppercase no-underline"
         >
+          <span className="material-symbols-outlined text-sm">arrow_back</span>
           前へ
         </Link>
       )}
       {pages.map((p, i) =>
         p === "..." ? (
-          <span key={`ellipsis-${i}`} className="px-3 py-2 text-sm text-gray-400">
+          <span key={`ellipsis-${i}`} className="mx-2 text-outline-variant">
             ...
           </span>
         ) : (
           <Link
             key={p}
             to={p === 1 ? baseUrl : `${baseUrl}/page/${p}`}
-            className={`px-3 py-2 text-sm border rounded no-underline ${
+            className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-sm no-underline transition-all ${
               p === currentPage
-                ? "bg-gray-900 text-white border-gray-900"
-                : "text-gray-700 hover:bg-gray-50"
+                ? "bg-primary text-on-primary"
+                : "bg-surface-container-high text-primary hover:bg-primary hover:text-on-primary"
             }`}
           >
             {p}
@@ -50,9 +51,10 @@ export function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps
       {currentPage < totalPages && (
         <Link
           to={`${baseUrl}/page/${currentPage + 1}`}
-          className="px-3 py-2 text-sm border rounded hover:bg-gray-50 no-underline text-gray-700"
+          className="flex items-center gap-2 px-6 py-2 bg-surface-container-high text-primary hover:bg-primary hover:text-on-primary transition-all font-bold text-xs tracking-widest uppercase no-underline"
         >
           次へ
+          <span className="material-symbols-outlined text-sm">arrow_forward</span>
         </Link>
       )}
     </nav>
