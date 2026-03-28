@@ -1,0 +1,124 @@
+{
+  "homepage_desktop": {
+    "h1_text": "書き起こし記事一覧",
+    "h1_visible": true,
+    "intro_text": "講演・インタビュー・スピーチの書き起こし記事を掲載しています。 ビジネス、政治、社会、IT、エンターテイメントなど幅広いジャンルの トークを文字で読むことができます。",
+    "category_labels": [
+      "ビジネス",
+      "政治",
+      "社会",
+      "海外",
+      "IT",
+      "エンタメ"
+    ],
+    "footer_links": [
+      {
+        "text": "サイトについて",
+        "href": "/share/about"
+      },
+      {
+        "text": "利用規約",
+        "href": "/share/tos"
+      },
+      {
+        "text": "プライバシーポリシー",
+        "href": "/share/privacy"
+      },
+      {
+        "text": "お問い合わせ",
+        "href": "/share/contact"
+      },
+      {
+        "text": "運営情報",
+        "href": "/share/company"
+      },
+      {
+        "text": "特定商取引法",
+        "href": "/share/regal"
+      }
+    ],
+    "nav_exists": true,
+    "hamburger_exists": true,
+    "hamburger_visible": false
+  },
+  "homepage_mobile": {
+    "h1_text": "書き起こし記事一覧",
+    "h1_visible": true,
+    "intro_text": "講演・インタビュー・スピーチの書き起こし記事を掲載しています。 ビジネス、政治、社会、IT、エンターテイメントなど幅広いジャンルの トークを文字で読むことができます。",
+    "category_labels": [
+      "ビジネス",
+      "政治",
+      "社会",
+      "海外",
+      "IT",
+      "エンタメ"
+    ],
+    "footer_links": [
+      {
+        "text": "サイトについて",
+        "href": "/share/about"
+      },
+      {
+        "text": "利用規約",
+        "href": "/share/tos"
+      },
+      {
+        "text": "プライバシーポリシー",
+        "href": "/share/privacy"
+      },
+      {
+        "text": "お問い合わせ",
+        "href": "/share/contact"
+      },
+      {
+        "text": "運営情報",
+        "href": "/share/company"
+      },
+      {
+        "text": "特定商取引法",
+        "href": "/share/regal"
+      }
+    ],
+    "nav_exists": true,
+    "hamburger_exists": true,
+    "hamburger_visible": true
+  },
+  "article_desktop": {
+    "author_text": null,
+    "related_section_exists": false,
+    "editorial_note_exists": true,
+    "h1_text": "【TED Talks】“ママ抱っこしてよ”闇の中でもがく子供たち（登丸賢美）"
+  },
+  "article_mobile": {
+    "author_text": null,
+    "related_section_exists": false,
+    "editorial_note_exists": true,
+    "h1_text": "【TED Talks】“ママ抱っこしてよ”闇の中でもがく子供たち（登丸賢美）"
+  },
+  "footer_pages": [
+    {
+      "url": "https://kakiokosi.com/share/about",
+      "text": "サイトについて"
+    },
+    {
+      "url": "https://kakiokosi.com/share/tos",
+      "text": "利用規約"
+    },
+    {
+      "url": "https://kakiokosi.com/share/privacy",
+      "text": "プライバシーポリシー"
+    },
+    {
+      "url": "https://kakiokosi.com/share/contact",
+      "text": "お問い合わせ"
+    },
+    {
+      "url": "https://kakiokosi.com/share/company",
+      "text": "運営情報"
+    },
+    {
+      "url": "https://kakiokosi.com/share/regal",
+      "text": "特定商取引法"
+    }
+  ]
+}

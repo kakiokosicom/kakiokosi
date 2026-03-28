@@ -234,6 +234,27 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
           dangerouslySetInnerHTML={{ __html: formatArticleContent(post.content) }}
         />
 
+        {/* Voicy Player */}
+        {post.voicy_url && (
+          <div className="mt-12 p-6 bg-surface-container-low rounded-2xl">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-xl">🎙️</span>
+              <div>
+                <p className="text-sm font-medium text-primary">この記事の音声版</p>
+                <p className="text-xs text-on-surface-variant">Voicy（ボイシー）で聴く</p>
+              </div>
+            </div>
+            <a
+              href={post.voicy_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FF6D3B] text-white rounded-full text-sm font-medium no-underline hover:bg-[#E55A2B] transition-colors"
+            >
+              ▶ Voicyで再生する
+            </a>
+          </div>
+        )}
+
         {/* Tags */}
         {tags.length > 0 && (
           <footer className="mt-20 pt-8 border-t border-outline-variant/20">

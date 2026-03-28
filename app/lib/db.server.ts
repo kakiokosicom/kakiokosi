@@ -7,6 +7,7 @@ export type Post = {
   status: string;
   primary_category: string;
   thumbnail_url: string | null;
+  voicy_url: string | null;
   published_at: string | null;
   created_at: string;
   updated_at: string;
