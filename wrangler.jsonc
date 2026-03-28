@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "kakiokosi",
+  "compatibility_date": "2025-04-04",
+  "main": "./workers/app.ts",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "kakiokosi-db",
+      "database_id": "a5cb03d2-44eb-4d43-9c1c-90782ffe06a7"
+    }
+  ]
+}
