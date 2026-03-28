@@ -105,7 +105,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
           ? { "@type": "ImageObject", url: post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}` }
           : { "@type": "ImageObject", url: "https://kakiokosi.com/images/default-og.svg" },
         author: {
-          "@type": "Organization",
+          "@type": "Person",
           name: "書き起こし.com編集部",
           url: "https://kakiokosi.com/share/about",
         },
@@ -159,8 +159,8 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
 
         <header className="mb-12">
           <div className="flex items-center gap-4 mb-6 flex-wrap">
-            <span className="font-label text-xs uppercase tracking-[0.2em] text-secondary font-bold">
-              {categoryLabelEn}
+            <span className="font-label text-xs tracking-[0.2em] text-secondary font-bold">
+              {categoryLabel}
             </span>
             <span className="w-1.5 h-1.5 rounded-full bg-outline-variant/30" />
             <time
