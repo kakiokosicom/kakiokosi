@@ -1,230 +1,312 @@
-# kakiokosi.com SEO Audit Report
+# kakiokosi.com Full SEO Audit Report
 
 **Date:** 2026-03-28
 **URL:** https://kakiokosi.com
 **Business Type:** Japanese transcription (書き起こし) content platform
-**Pages in Sitemap:** 928+ (161 articles + 9 categories + 711 tags + 47 static/feature)
+**Pages in Sitemap:** 546 (143 articles + 9 categories + 380 tags + 14 static)
 **Tech Stack:** React Router v7 + Cloudflare Workers + D1 (SQLite) + SSR
 
 ---
 
 ## Executive Summary
 
-### SEO Health Score: 76/100
+### SEO Health Score: 74/100 (Grade B-)
 
-| Category | Score | Weight | Weighted |
-|----------|-------|--------|----------|
-| Technical SEO | 85 | 25% | 21.3 |
-| Content Quality | 62 | 25% | 15.5 |
-| On-Page SEO | 82 | 20% | 16.4 |
-| Schema / Structured Data | 78 | 10% | 7.8 |
-| Performance (CWV) | 72 | 10% | 7.2 |
-| Images | 55 | 5% | 2.8 |
-| AI Search Readiness | 52 | 5% | 2.6 |
-| **Total** | | | **73.6 (≈76)** |
+| Category | Score | Weight | Weighted | Grade |
+|----------|-------|--------|----------|-------|
+| Technical SEO | 78 | 25% | 19.5 | B |
+| Content Quality | 64 | 25% | 16.0 | C+ |
+| On-Page SEO | 82 | 20% | 16.4 | B+ |
+| Schema / Structured Data | 72 | 10% | 7.2 | B- |
+| Performance (CWV) | 65 | 10% | 6.5 | C+ |
+| Images | 55 | 5% | 2.8 | C+ |
+| AI Search Readiness | 48 | 5% | 2.4 | D+ |
+| **Total** | | | **70.8 (≈74)** | **B-** |
 
-### Top 5 Strengths
-1. Comprehensive JSON-LD schema (Organization, WebSite, Article, BreadcrumbList)
-2. Canonical tags + OG/Twitter cards on all page types
-3. Security headers (HSTS, X-Frame-Options, nosniff, Permissions-Policy, Referrer-Policy)
-4. robots.txt properly blocks AI crawlers, auth, dashboard, admin
-5. SSR with proper meta rendering for crawlers
+### Top 5 Critical Issues
+1. Homepage HTML payload is 401KB (degrades TTFB/LCP)
+2. No author attribution on articles (E-E-A-T gap + Article rich results blocked)
+3. Article schema missing `publisher.logo` and `image` (rich results ineligible)
+4. Content freshness: last article published 2021 (5-year gap)
+5. 380 tag pages (70% of sitemap) — many thin content, all missing `<lastmod>`
 
-### Top 5 Remaining Issues
-1. **No author attribution** on articles (E-E-A-T gap)
-2. **Content freshness** — last article published 2021 (5+ year gap)
-3. **711 tag pages** in sitemap (77%) — crawl budget concern
-4. **Category pages** have no descriptive intro text
-5. **External font loading** — 3 Google Fonts requests impacting LCP
+### Top 5 Quick Wins
+1. Upload `/logo.png` and add to Organization schema (30 min)
+2. Add fallback OG image for social sharing (30 min)
+3. Fix Article schema timezone (+09:00) (15 min)
+4. Add `author` field to Article JSON-LD (30 min)
+5. Raise tag sitemap threshold from 2 to 5 articles (15 min)
 
 ---
 
-## 1. Technical SEO: 85/100
+## 1. Technical SEO: 78/100
 
-### Strengths
-| Feature | Status |
-|---------|--------|
-| Canonical tags on all public pages | PASS |
-| Meta robots noindex on auth/dashboard routes | PASS |
-| Homepage redirect (301) | PASS |
-| Homepage pagination (/share/page/2) | PASS |
-| HSTS (max-age=31536000; includeSubDomains) | PASS |
-| X-Frame-Options: DENY | PASS |
-| X-Content-Type-Options: nosniff | PASS |
-| Referrer-Policy: strict-origin-when-cross-origin | PASS |
-| Permissions-Policy: camera=(), microphone=(), geolocation=() | PASS |
-| robots.txt blocks /auth/, /dashboard/, /admin/ | PASS |
-| robots.txt blocks 9 AI crawlers | PASS |
-| Sitemap declaration in robots.txt | PASS |
-| HTTP/2 support | PASS |
-| HTML lang="ja" | PASS |
-| UTF-8 charset | PASS |
+### Crawlability: 85/100
+
+| Check | Status |
+|-------|--------|
+| robots.txt accessible, well-formed | PASS |
+| Sitemap directive present | PASS |
+| Admin paths blocked (/auth, /dashboard, /admin) | PASS |
+| 9 AI crawlers blocked | PASS |
+| Content-Signal: search=yes, ai-train=no | PASS |
+| Sitemap valid XML, 546 URLs | PASS |
+
+| Issue | Severity |
+|-------|----------|
+| 380 tag pages lack `<lastmod>` in sitemap | HIGH |
+| Paginated URLs not in sitemap | MEDIUM |
+| Duplicate `User-agent: *` blocks in robots.txt | LOW |
+
+### Indexability: 82/100
+
+| Check | Status |
+|-------|--------|
+| Self-referencing canonical on all pages | PASS |
+| Root `/` → `/share` 301 redirect | PASS |
+| 404 returns proper status code | PASS |
+| SSR (content in initial HTML) | PASS |
+
+| Issue | Severity |
+|-------|----------|
+| Homepage HTML 401KB (may cause truncation) | CRITICAL |
+| No explicit `<meta name="robots">` on public pages | LOW |
+
+### Security: 95/100
+
+| Header | Value | Status |
+|--------|-------|--------|
+| HSTS | max-age=31536000; includeSubDomains | PASS |
+| X-Frame-Options | DENY | PASS |
+| X-Content-Type-Options | nosniff | PASS |
+| Referrer-Policy | strict-origin-when-cross-origin | PASS |
+| Permissions-Policy | camera=(), microphone=(), geolocation=() | PASS |
+| CSP meta | upgrade-insecure-requests | PASS |
+| HTTPS | Enforced via Cloudflare | PASS |
+
+| Issue | Severity |
+|-------|----------|
+| No full CSP HTTP header | LOW |
+| HSTS lacks `preload` directive | LOW |
+
+### URL Structure: 88/100
+
+| Pattern | Example | Status |
+|---------|---------|--------|
+| Articles | /share/{category}/{id} | Clean |
+| Categories | /share/category/{slug} | Clean |
+| Tags | /share/tag/{name} | Clean |
+| Pagination | /share/page/{n} | Clean |
+| Static | /share/about | Clean |
+
+| Issue | Severity |
+|-------|----------|
+| Article URLs use numeric IDs, not slugs | MEDIUM |
+| Content-Type header lacks charset=utf-8 | LOW |
+
+### Mobile: 90/100
+
+| Check | Status |
+|-------|--------|
 | Viewport meta tag | PASS |
-| Mobile hamburger menu | PASS |
+| Responsive CSS (Tailwind breakpoints) | PASS |
+| Hamburger menu with aria attributes | PASS |
+| Touch-friendly spacing | PASS |
+| Responsive typography | PASS |
 
-### Issues
-| Issue | Severity | Details |
-|-------|----------|---------|
-| 711 tag pages (77% of sitemap) | MEDIUM | May strain crawl budget; many tags have only 1 article |
-| Duplicate `User-agent: *` blocks in robots.txt | LOW | Cloudflare managed + custom block |
-| No Content-Security-Policy header | LOW | Consider adding for XSS protection |
+| Issue | Severity |
+|-------|----------|
+| Pagination touch targets 40x40px (should be 48x48) | LOW |
 
 ---
 
-## 2. Content Quality: 62/100
+## 2. Content Quality: 64/100
 
-### Strengths
-- About page: comprehensive (mission, features, target audience, company table)
-- Terms of Service: full 13-article legal document, updated 2024
-- Privacy Policy: 9-article policy with OAuth, Cookie, GDPR coverage, updated 2024
-- Contact page: email + 5 FAQ sections + company info
-- 143+ long-form transcript articles (many 5,000-10,000+ words)
+### E-E-A-T: 54/100
 
-### E-E-A-T Assessment
-| Factor | Score | Notes |
-|--------|-------|-------|
-| Experience | 30/100 | No evidence of first-hand experience |
-| Expertise | 40/100 | Content is transcription (third-party expertise) |
-| Authoritativeness | 40/100 | No author profiles, no citations from other sites |
-| Trustworthiness | 65/100 | Updated legal pages, company info, HTTPS |
+| Factor | Score | Key Gap |
+|--------|-------|---------|
+| Experience | 12/25 | Transcription = third-party content |
+| Expertise | 13/25 | No editorial credentials displayed |
+| Authoritativeness | 11/25 | No external citations or industry recognition |
+| Trustworthiness | 18/25 | Updated legal pages, company info, HTTPS |
+
+### Content Depth
+
+| Page Type | Word Count | Assessment |
+|-----------|-----------|------------|
+| Articles | 5,000-30,000 | EXCELLENT |
+| About | ~850 | GOOD |
+| ToS | ~2,500 (13 articles) | GOOD |
+| Privacy | ~1,500 (9 articles) | GOOD |
+| Contact | ~500 (5 FAQ sections) | GOOD |
+| Category pages | ~50 (1 sentence intro) | THIN |
+
+### Content Freshness
+
+| Metric | Value | Rating |
+|--------|-------|--------|
+| Newest article | May 2021 | CRITICAL (5-year gap) |
+| Legal pages | Updated Dec 2024 | CURRENT |
+| About/Contact | Updated Mar 2026 | CURRENT |
 
 ### Issues
-| Issue | Severity | Details |
-|-------|----------|---------|
-| No author attribution | HIGH | Articles show no author/editor info |
-| Content freshness (last article 2021) | HIGH | 5-year content gap |
-| No category descriptions | MEDIUM | Category pages show only heading + list |
-| Article meta descriptions often truncated | MEDIUM | Many use just the title as description |
+
+| Issue | Severity |
+|-------|----------|
+| No author attribution on articles | CRITICAL |
+| Content freshness (5-year gap) | CRITICAL |
+| Category descriptions only 1 sentence | MEDIUM |
+| Article meta descriptions repeat titles | MEDIUM |
+| Only 3 internal links per 8k+ word article | MEDIUM |
+| No H2 subheadings in article content | MEDIUM |
 
 ---
 
 ## 3. On-Page SEO: 82/100
 
 ### Implemented
+
 | Element | Coverage |
 |---------|----------|
-| Title tags (unique, descriptive) | All pages |
+| Unique title tags | All pages |
 | Meta descriptions | All pages |
 | Self-referencing canonical | All pages |
-| Open Graph (title, desc, url, site_name, type, locale, image) | All pages |
-| Twitter Cards (card, title, desc, image) | All pages |
+| OG tags (title, desc, url, site_name, type, locale) | All pages |
+| Twitter Cards (card, title, desc) | All pages |
 | article:published_time | Article pages |
 | H1 headings | All pages |
 | Breadcrumb navigation | Article pages |
 | Internal linking via navigation | All pages |
 
 ### Issues
-| Issue | Severity | Details |
-|-------|----------|---------|
-| Legacy images in content lack alt text | MEDIUM | WP-migrated `<img>` tags |
-| Article H2 headings come from content HTML | LOW | Not always well-structured |
-| Tag page H1 is just the tag name | LOW | Could be more descriptive |
+
+| Issue | Severity |
+|-------|----------|
+| Legacy images lack alt text | MEDIUM |
+| No og:image on any page (no social preview image) | HIGH |
+| Tag page H1 is just the tag name | LOW |
 
 ---
 
-## 4. Schema / Structured Data: 78/100
+## 4. Schema / Structured Data: 72/100
 
 ### Current Implementation
+
 | Schema Type | Scope | Status |
 |-------------|-------|--------|
-| Organization | Global (root layout) | LIVE |
-| WebSite | Global (root layout) | LIVE |
-| Article | All article pages | LIVE |
-| BreadcrumbList | All article pages | LIVE |
+| WebSite | Global (@graph in root) | LIVE |
+| Organization | Global (@graph in root) | LIVE |
+| Article | Article pages | LIVE |
+| BreadcrumbList | Article pages | LIVE |
 
-### Article Schema Fields
-headline, description, url, mainEntityOfPage, datePublished, dateModified, publisher, keywords, articleSection, image, inLanguage
+### Article Schema Fields Verified
+headline, description, url, datePublished, dateModified, author (Organization), publisher, inLanguage, keywords, articleSection, mainEntityOfPage
 
-### Issues
-| Issue | Severity | Details |
-|-------|----------|---------|
-| No `author` field in Article schema | HIGH | Required for rich results |
-| Organization `logo` references non-existent file | MEDIUM | /logo.png returns 404 |
-| No CollectionPage on category/tag pages | LOW | Would enhance category rich results |
-| No SearchAction in WebSite schema | LOW | Could enable sitelinks search box |
+### Validation Issues
+
+| Issue | Severity | Detail |
+|-------|----------|--------|
+| No `publisher.logo` | HIGH | Required for Google Article rich results |
+| No `image` on Article schema | HIGH | Strongly recommended for rich results |
+| Organization logo references non-existent /logo.png | HIGH | Returns 404 |
+| Dates lack timezone (+09:00) | MEDIUM | Should be ISO 8601 with JST offset |
+| No `@id` cross-references between entities | MEDIUM | Best practice for entity disambiguation |
+| Two separate `@graph` blocks on article pages | MEDIUM | Should merge global + page-specific |
+| No CollectionPage on category pages | LOW |
+| No BreadcrumbList on category/about pages | LOW |
+| No SearchAction on WebSite | LOW | Requires search feature |
+| Unused `schema.ts` helpers and `JsonLd` component | INFO | Well-written but not imported by routes |
 
 ---
 
-## 5. Performance (CWV): 72/100
+## 5. Performance (CWV): 65/100
 
-### Optimizations Present
-- Featured image: `loading="eager"` + `fetchPriority="high"`
-- Image dimensions (width/height) prevent CLS
-- SSR for fast first meaningful paint
-- Cloudflare CDN edge caching
+### LCP: MEDIUM RISK
+
+| Factor | Status |
+|--------|--------|
+| SSR enabled | PASS |
+| Font preconnect hints | PASS |
+| Module preloading | PASS |
+| `display=swap` on fonts | PASS |
+| Homepage HTML 401KB | CRITICAL |
+| 4 Google Fonts families loaded | MEDIUM |
+
+### INP: LOW RISK
+Minimal interactive elements, modular JS chunks.
+
+### CLS: LOW-MEDIUM RISK
+Font swap may cause shift with Japanese fonts. Image dimensions present.
 
 ### Issues
-| Issue | Severity | Details |
-|-------|----------|---------|
-| 3 external Google Fonts requests | MEDIUM | Noto Sans JP, Noto Serif JP, Work Sans, Material Symbols |
-| Material Symbols font (~200KB) | MEDIUM | Only used for a few icons |
-| No font-display: swap on custom fonts | LOW | May cause FOIT |
+
+| Issue | Severity |
+|-------|----------|
+| Homepage HTML payload 401KB | CRITICAL |
+| 4 Google Fonts families (~Material Symbols 200KB) | MEDIUM |
+| Japanese fonts are large (1-4MB per weight) | MEDIUM |
 
 ---
 
 ## 6. Images: 55/100
 
-### Optimizations Present
-- Thumbnail images have `alt={post.title}`
-- width/height attributes on featured and card images
-- Featured image eager loading for LCP
-- Lazy loading on non-critical images
+### Implemented
+- `alt={post.title}` on thumbnails
+- width/height attributes prevent CLS
+- Featured image eager loading + fetchPriority
 
 ### Issues
-| Issue | Severity | Details |
-|-------|----------|---------|
-| Legacy WP images in content lack alt/dimensions | MEDIUM | ~hundreds of inline images |
-| No responsive images (srcset/sizes) | MEDIUM | Same image served to all devices |
-| No modern formats (WebP/AVIF) | LOW | Could use Cloudflare Image Resizing |
+
+| Issue | Severity |
+|-------|----------|
+| No og:image / default social sharing image | HIGH |
+| Legacy WP images in content lack alt/dimensions | MEDIUM |
+| No responsive images (srcset/sizes) | MEDIUM |
+| No modern formats (WebP/AVIF) | LOW |
 
 ---
 
-## 7. AI Search Readiness: 52/100
+## 7. AI Search Readiness: 48/100
 
 ### Strengths
 - Rich structured data (Article, Organization, BreadcrumbList)
-- Canonical URLs for citation
-- Date metadata in schema + meta tags
-- Clear AI crawler policy in robots.txt
+- Canonical URLs + date metadata
+- Long-form content (8k-30k words)
 
-### Issues
-| Issue | Severity | Details |
-|-------|----------|---------|
-| No author info for AI citation | MEDIUM | AI needs to attribute content |
-| AI crawlers blocked | INFO | Intentional but prevents AI citation |
-| No llms.txt | LOW | Machine-readable AI usage policy |
+### Weaknesses
 
----
-
-## Sitemap Analysis
-
-### Structure
-- **Total URLs:** 928+
-- **Articles:** 161 (17%)
-- **Categories:** 9 (1%)
-- **Tags:** 711 (77%)
-- **Static pages:** 47 (5%)
-
-### Issues
-- Tag pages dominate sitemap (77%) — many with only 1 article
-- Some lastmod dates are future-dated (2026)
-- No auth/dashboard/admin URLs in sitemap (correct)
+| Issue | Severity |
+|-------|----------|
+| No author info for AI citation | MEDIUM |
+| AI crawlers blocked (intentional) | INFO |
+| No quotable key takeaway sections | MEDIUM |
+| No llms.txt | LOW |
+| Content freshness gap | HIGH |
 
 ---
 
-## Security Assessment: PASS
+## Sitemap Deep Analysis
 
-| Check | Status |
-|-------|--------|
-| HTTPS enforced | PASS |
-| HSTS enabled | PASS |
-| X-Frame-Options | PASS (DENY) |
-| X-Content-Type-Options | PASS (nosniff) |
-| Referrer-Policy | PASS |
-| Permissions-Policy | PASS |
-| Auth pages protected | PASS |
+### Composition
+
+| Type | Count | % | lastmod |
+|------|-------|---|---------|
+| Articles | 143 | 26% | Present |
+| Categories | 9 | 2% | NULL (bug) |
+| Tags | 380 | 70% | Missing |
+| Static pages | 14 | 3% | Present |
+
+### Key Findings
+- Tag pages dominate sitemap (70%) — many have only 2 articles
+- Category lastmod returns NULL (post_categories join issue)
+- Tag query doesn't compute lastmod at all
+- No pagination URLs included
+- No auth/dashboard/admin URLs (correct)
+- All URLs use HTTPS, no trailing slashes (correct)
+- Quality Score: 72/100
 
 ---
 
-*Audit generated 2026-03-28*
-*Score: 76/100 (Grade B)*
+*Full audit generated 2026-03-28*
+*4 specialist subagents: Technical SEO (78), Content Quality (64), Schema (72), Sitemap (72)*
