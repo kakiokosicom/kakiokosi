@@ -1,0 +1,20 @@
+# 書き起こし.com
+
+> 講演・インタビュー・スピーチの書き起こし記事を共有するサイト
+
+## About
+
+書き起こし.com is a Japanese transcription archive publishing verbatim transcripts of speeches, interviews, and presentations since 2011. All content is in Japanese.
+
+## Content Policy
+
+- Search indexing and excerpts: Allowed
+- AI model training and fine-tuning: Not permitted
+- Real-time AI search (citations, summaries): Allowed with attribution
+- When citing content, attribute to "書き起こし.com" with a link to the source URL
+
+## Contact
+
+- Email: info@kakiokosi.com
+- Website: https://kakiokosi.com
+- Operator: 株式会社ユリカ (YURIKA, K.K.)

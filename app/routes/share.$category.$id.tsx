@@ -3,6 +3,7 @@ import type { Route } from "./+types/share.$category.$id";
 import { getPost, getRelatedPosts } from "~/lib/db.server";
 import type { Post } from "~/lib/db.server";
 import { formatArticleContent } from "~/lib/format-content";
+import { Icon } from "~/components/icon";
 
 const CATEGORY_LABELS: Record<string, string> = {
   business: "ビジネス",
@@ -269,9 +270,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
           {/* Categories */}
           <div className="p-8 bg-surface-container-low rounded-xl">
             <div className="flex items-center gap-3 mb-6 text-primary">
-              <span className="material-symbols-outlined text-xl">
-                menu_book
-              </span>
+              <Icon name="menu_book" className="w-5 h-5" />
               <h3 className="font-serif italic text-xl">カテゴリ</h3>
             </div>
             <nav className="flex flex-col gap-4">
@@ -292,9 +291,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
 
           {/* About */}
           <div className="p-8 bg-primary-container text-white rounded-xl relative overflow-hidden">
-            <span className="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl opacity-10">
-              auto_stories
-            </span>
+            <Icon name="auto_stories" className="absolute -right-4 -bottom-4 w-20 h-20 opacity-10" />
             <h3 className="font-serif text-xl mb-2">書き起こし.comとは</h3>
             <p className="text-xs text-on-primary-container mb-6 leading-relaxed">
               2011年から講演・スピーチ・インタビューを文字に起こし、知識として共有しています。
@@ -304,7 +301,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
               className="inline-flex items-center gap-2 text-xs font-bold text-secondary no-underline hover:underline"
             >
               詳しく見る
-              <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              <Icon name="arrow_forward" className="w-4 h-4" />
             </Link>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { Icon } from "./icon";
 
 type PaginationProps = {
   currentPage: number;
@@ -25,7 +26,7 @@ export function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps
           to={currentPage === 2 ? baseUrl : `${baseUrl}/page/${currentPage - 1}`}
           className="flex items-center gap-2 px-6 py-2 bg-surface-container-high text-primary hover:bg-primary hover:text-on-primary transition-all font-bold text-xs tracking-widest uppercase no-underline"
         >
-          <span className="material-symbols-outlined text-sm">arrow_back</span>
+          <Icon name="arrow_back" className="w-4 h-4" />
           前へ
         </Link>
       )}
@@ -54,7 +55,7 @@ export function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps
           className="flex items-center gap-2 px-6 py-2 bg-surface-container-high text-primary hover:bg-primary hover:text-on-primary transition-all font-bold text-xs tracking-widest uppercase no-underline"
         >
           次へ
-          <span className="material-symbols-outlined text-sm">arrow_forward</span>
+          <Icon name="arrow_forward" className="w-4 h-4" />
         </Link>
       )}
     </nav>

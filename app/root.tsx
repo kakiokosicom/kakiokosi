@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Icon } from "./components/icon";
 import {
   isRouteErrorResponse,
   Links,
@@ -34,10 +35,6 @@ export const links: Route.LinksFunction = () => [
   {
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700;900&family=Work+Sans:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&display=swap",
-  },
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@24,400,0&display=swap",
   },
   {
     rel: "alternate",
@@ -159,9 +156,7 @@ function Header({ user }: { user: SessionUser | null }) {
             aria-label="メニュー"
             aria-expanded={mobileMenuOpen}
           >
-            <span className="material-symbols-outlined text-2xl">
-              {mobileMenuOpen ? "close" : "menu"}
-            </span>
+            <Icon name={mobileMenuOpen ? "close" : "menu"} className="w-6 h-6" />
           </button>
           {user ? (
             <div className="hidden md:flex items-center gap-3">
