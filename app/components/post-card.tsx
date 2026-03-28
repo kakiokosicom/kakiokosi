@@ -2,12 +2,12 @@ import { Link } from "react-router";
 import type { Post } from "~/lib/db.server";
 
 const CATEGORY_LABELS: Record<string, string> = {
-  business: "Business",
-  politics: "Politics",
-  society: "Society",
-  world: "Foreign",
+  business: "ビジネス",
+  politics: "政治",
+  society: "社会",
+  world: "海外",
   it: "IT",
-  entertainment: "Entertainment",
+  entertainment: "エンタメ",
 };
 
 export function PostCard({ post, featured }: { post: Post; featured?: boolean }) {

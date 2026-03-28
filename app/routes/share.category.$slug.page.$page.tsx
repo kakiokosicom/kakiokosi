@@ -55,6 +55,7 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
     { property: "og:description", content: description },
     { property: "og:url", content: url },
     { property: "og:site_name", content: "書き起こし.com" },
+    { property: "og:locale", content: "ja_JP" },
     { name: "twitter:card", content: "summary" },
   ];
 }

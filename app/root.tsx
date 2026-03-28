@@ -16,12 +16,12 @@ import { getCurrentUser, type SessionUser } from "./lib/auth.server";
 import "./app.css";
 
 const CATEGORIES = [
-  { slug: "business", label: "Business" },
-  { slug: "politics", label: "Politics" },
-  { slug: "society", label: "Society" },
-  { slug: "world", label: "Foreign" },
+  { slug: "business", label: "ビジネス" },
+  { slug: "politics", label: "政治" },
+  { slug: "society", label: "社会" },
+  { slug: "world", label: "海外" },
   { slug: "it", label: "IT" },
-  { slug: "entertainment", label: "Entertainment" },
+  { slug: "entertainment", label: "エンタメ" },
 ];
 
 export const links: Route.LinksFunction = () => [
@@ -218,25 +218,25 @@ export default function App({ loaderData }: Route.ComponentProps) {
               to="/share/about"
               className="font-label text-xs uppercase tracking-widest text-white/60 hover:text-secondary no-underline transition-all"
             >
-              About this site
+              サイトについて
             </Link>
             <Link
               to="/share/tos"
               className="font-label text-xs uppercase tracking-widest text-white/60 hover:text-secondary no-underline transition-all"
             >
-              Terms of Use
+              利用規約
             </Link>
             <Link
               to="/share/privacy"
               className="font-label text-xs uppercase tracking-widest text-white/60 hover:text-secondary no-underline transition-all"
             >
-              Privacy Policy
+              プライバシーポリシー
             </Link>
             <Link
               to="/share/contact"
               className="font-label text-xs uppercase tracking-widest text-white/60 hover:text-secondary no-underline transition-all"
             >
-              Inquiry
+              お問い合わせ
             </Link>
             <Link
               to="/share/company"

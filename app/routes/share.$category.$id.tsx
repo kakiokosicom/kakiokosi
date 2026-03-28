@@ -56,6 +56,7 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
     { property: "og:type", content: "article" },
     { property: "og:url", content: url },
     { property: "og:site_name", content: "書き起こし.com" },
+    { property: "og:locale", content: "ja_JP" },
     ...(post.thumbnail_url
       ? [
           { property: "og:image", content: post.thumbnail_url },
