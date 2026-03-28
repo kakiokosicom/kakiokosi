@@ -35,7 +35,6 @@ export function organizationSchema() {
       email: "info@kakiokosi.com",
       availableLanguage: "Japanese",
     },
-    sameAs: [],
   };
 }
 
@@ -89,6 +88,7 @@ export function collectionPageSchema(opts: {
   name: string;
   description: string;
   url: string;
+  numberOfItems?: number;
 }) {
   return {
     "@context": "https://schema.org",
@@ -102,6 +102,9 @@ export function collectionPageSchema(opts: {
       url: SITE_URL,
     },
     inLanguage: "ja",
+    ...(opts.numberOfItems != null
+      ? { mainEntity: { "@type": "ItemList", numberOfItems: opts.numberOfItems } }
+      : {}),
   };
 }
 

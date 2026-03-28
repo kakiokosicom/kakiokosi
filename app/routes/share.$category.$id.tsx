@@ -68,6 +68,9 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
     ...(post.published_at
       ? [{ property: "article:published_time", content: post.published_at.replace(" ", "T") + "+09:00" }]
       : []),
+    ...((post.updated_at || post.published_at)
+      ? [{ property: "article:modified_time", content: (post.updated_at || post.published_at)!.replace(" ", "T") + "+09:00" }]
+      : []),
   ];
 }
 
@@ -100,8 +103,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
           ? { "@type": "ImageObject", url: post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}` }
           : { "@type": "ImageObject", url: "https://kakiokosi.com/images/default-og.png" },
         author: {
-          "@type": "Organization",
-          "@id": "https://kakiokosi.com/#organization",
+          "@type": "Person",
           name: "書き起こし.com編集部",
           url: "https://kakiokosi.com/share/about",
         },
@@ -116,6 +118,10 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
           ? { articleSection: categories.map((c) => c.name).join(", ") }
           : {}),
         mainEntityOfPage: { "@type": "WebPage", "@id": articleUrl },
+        speakable: {
+          "@type": "SpeakableSpecification",
+          cssSelector: [".article-content", "h1"],
+        },
       },
       {
         "@type": "BreadcrumbList",

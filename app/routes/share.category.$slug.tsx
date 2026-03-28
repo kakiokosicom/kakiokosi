@@ -82,6 +82,7 @@ export default function CategoryPage({ loaderData }: Route.ComponentProps) {
         name: `${label}の書き起こし記事一覧`,
         description: CATEGORY_DESCRIPTIONS[category.slug] || `${label}カテゴリの書き起こし記事一覧`,
         url: `https://kakiokosi.com/share/category/${category.slug}`,
+        numberOfItems: loaderData.total,
       })} />
       <header className="mb-16">
         <div className="inline-block bg-secondary-container px-3 py-1 text-[10px] font-bold tracking-[0.2em] text-on-secondary-container mb-4 uppercase">

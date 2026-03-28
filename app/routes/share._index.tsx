@@ -34,7 +34,7 @@ export async function loader({ context }: Route.LoaderArgs) {
 }
 
 export default function ShareIndex({ loaderData }: Route.ComponentProps) {
-  const { posts, totalPages } = loaderData;
+  const { posts, totalPages, total } = loaderData;
   const featured = posts[0];
   const rest = posts.slice(1);
 
@@ -44,6 +44,7 @@ export default function ShareIndex({ loaderData }: Route.ComponentProps) {
         name: "書き起こし記事一覧",
         description: "講演・インタビュー・スピーチの書き起こし記事を共有するサイト",
         url: "https://kakiokosi.com/share",
+        numberOfItems: total,
       })} />
       <header className="mb-16">
         <div className="inline-block bg-secondary-container px-3 py-1 text-[10px] font-bold tracking-[0.2em] text-on-secondary-container mb-4 uppercase">

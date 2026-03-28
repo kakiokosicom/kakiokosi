@@ -4,24 +4,47 @@ Disallow: /auth/
 Disallow: /dashboard/
 Disallow: /admin/
 
+# AI crawlers - explicitly allow public content
 User-agent: GPTBot
 Allow: /share/
+Allow: /sitemap.xml
 Disallow: /auth/
 Disallow: /dashboard/
+Disallow: /admin/
 
 User-agent: ClaudeBot
 Allow: /share/
+Allow: /sitemap.xml
 Disallow: /auth/
 Disallow: /dashboard/
+Disallow: /admin/
 
 User-agent: Google-Extended
 Allow: /share/
+Allow: /sitemap.xml
 Disallow: /auth/
 Disallow: /dashboard/
+Disallow: /admin/
 
 User-agent: PerplexityBot
 Allow: /share/
+Allow: /sitemap.xml
 Disallow: /auth/
 Disallow: /dashboard/
+Disallow: /admin/
+
+User-agent: Bytespider
+Allow: /share/
+Allow: /sitemap.xml
+Disallow: /auth/
+Disallow: /dashboard/
+Disallow: /admin/
+
+User-agent: CCBot
+Allow: /share/
+Allow: /sitemap.xml
+Disallow: /auth/
+Disallow: /dashboard/
+Disallow: /admin/
 
 Sitemap: https://kakiokosi.com/sitemap.xml
