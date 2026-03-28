@@ -54,6 +54,9 @@ route("auth/logout", "routes/auth.logout.tsx"),
   route("dashboard/posts/new", "routes/dashboard.posts.new.tsx"),
   route("dashboard/posts/:id/edit", "routes/dashboard.posts.$id.edit.tsx"),
   route("dashboard/posts/:id/preview", "routes/dashboard.posts.$id.preview.tsx"),
+  // AI API
+  route("api/ai", "routes/api.ai.tsx"),
+
   // Admin
   route("admin", "routes/admin._index.tsx"),
   route("admin/review", "routes/admin.review.tsx"),

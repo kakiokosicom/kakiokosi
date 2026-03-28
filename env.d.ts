@@ -5,4 +5,5 @@ interface Env {
   TWITTER_CLIENT_ID: string;
   TWITTER_CLIENT_SECRET: string;
   APP_URL: string;
+  ANTHROPIC_API_KEY: string;
 }
