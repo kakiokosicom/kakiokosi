@@ -19,9 +19,11 @@ export function meta() {
     { property: "og:url", content: "https://kakiokosi.com/share" },
     { property: "og:site_name", content: "書き起こし.com" },
     { property: "og:locale", content: "ja_JP" },
-    { name: "twitter:card", content: "summary" },
+    { property: "og:image", content: "https://kakiokosi.com/images/default-og.svg" },
+    { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: "書き起こし.com" },
     { name: "twitter:description", content: description },
+    { name: "twitter:image", content: "https://kakiokosi.com/images/default-og.svg" },
   ];
 }
 

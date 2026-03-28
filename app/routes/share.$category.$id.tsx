@@ -60,17 +60,13 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
     { property: "og:url", content: url },
     { property: "og:site_name", content: "書き起こし.com" },
     { property: "og:locale", content: "ja_JP" },
-    ...(post.thumbnail_url
-      ? [
-          { property: "og:image", content: post.thumbnail_url },
-          { name: "twitter:image", content: post.thumbnail_url },
-        ]
-      : []),
-    { name: "twitter:card", content: post.thumbnail_url ? "summary_large_image" : "summary" },
+    { property: "og:image", content: post.thumbnail_url || "https://kakiokosi.com/images/default-og.svg" },
+    { name: "twitter:image", content: post.thumbnail_url || "https://kakiokosi.com/images/default-og.svg" },
+    { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: post.title },
     { name: "twitter:description", content: description },
     ...(post.published_at
-      ? [{ property: "article:published_time", content: post.published_at }]
+      ? [{ property: "article:published_time", content: post.published_at.replace(" ", "T") + "+09:00" }]
       : []),
   ];
 }
@@ -98,18 +94,19 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
         headline: post.title,
         description: post.excerpt || post.title,
         url: articleUrl,
-        datePublished: post.published_at?.replace(" ", "T") || undefined,
-        dateModified: (post.updated_at || post.published_at)?.replace(" ", "T") || undefined,
-        ...(post.thumbnail_url ? { image: post.thumbnail_url } : {}),
+        datePublished: post.published_at ? post.published_at.replace(" ", "T") + "+09:00" : undefined,
+        dateModified: (post.updated_at || post.published_at) ? (post.updated_at || post.published_at)!.replace(" ", "T") + "+09:00" : undefined,
+        image: post.thumbnail_url
+          ? { "@type": "ImageObject", url: post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}` }
+          : { "@type": "ImageObject", url: "https://kakiokosi.com/images/default-og.png" },
         author: {
-          "@type": "Person",
+          "@type": "Organization",
+          "@id": "https://kakiokosi.com/#organization",
           name: "書き起こし.com編集部",
           url: "https://kakiokosi.com/share/about",
         },
         publisher: {
-          "@type": "Organization",
-          name: "書き起こし.com",
-          url: "https://kakiokosi.com",
+          "@id": "https://kakiokosi.com/#organization",
         },
         inLanguage: "ja",
         ...(tags.length > 0

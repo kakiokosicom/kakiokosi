@@ -78,7 +78,9 @@ const GLOBAL_JSON_LD = {
       },
       address: {
         "@type": "PostalAddress",
-        addressLocality: "東京都",
+        streetAddress: "道玄坂1丁目10番8号 渋谷道玄坂東急ビル2F-C",
+        addressLocality: "渋谷区",
+        addressRegion: "東京都",
         addressCountry: "JP",
       },
       contactPoint: {

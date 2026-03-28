@@ -17,19 +17,21 @@ export async function loader({ context }: Route.LoaderArgs) {
       .prepare(
         `SELECT c.slug, MAX(COALESCE(p.updated_at, p.published_at)) as lastmod
          FROM categories c
-         LEFT JOIN post_categories pc ON pc.category_id = c.id
+         LEFT JOIN post_categories pc ON pc.category_slug = c.slug
          LEFT JOIN posts p ON p.id = pc.post_id AND p.status = 'published'
-         GROUP BY c.id`
+         GROUP BY c.slug`
       )
       .all<{ slug: string; lastmod: string | null }>(),
     db
       .prepare(
-        `SELECT t.slug FROM tags t
-         JOIN post_tags pt ON pt.tag_id = t.id
-         GROUP BY t.id
-         HAVING COUNT(pt.post_id) >= 2`
+        `SELECT t.slug, MAX(COALESCE(p.updated_at, p.published_at)) as lastmod
+         FROM tags t
+         JOIN post_tags pt ON pt.tag_slug = t.slug
+         JOIN posts p ON p.id = pt.post_id AND p.status = 'published'
+         GROUP BY t.slug
+         HAVING COUNT(pt.post_id) >= 5`
       )
-      .all<{ slug: string }>(),
+      .all<{ slug: string; lastmod: string | null }>(),
   ]);
 
   const urls: string[] = [];
@@ -48,9 +50,9 @@ export async function loader({ context }: Route.LoaderArgs) {
     urls.push(entry(baseUrl, `/share/category/${cat.slug}`, cat.lastmod ?? null));
   }
 
-  // Tag pages
+  // Tag pages (only tags with 5+ articles)
   for (const tag of tags.results) {
-    urls.push(entry(baseUrl, `/share/tag/${tag.slug}`, null));
+    urls.push(entry(baseUrl, `/share/tag/${tag.slug}`, tag.lastmod ?? null));
   }
 
   // Static pages (exclude login/regist/update/preparation/complete_regist)
