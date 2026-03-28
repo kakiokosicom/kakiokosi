@@ -21,7 +21,7 @@ export async function loader({ context }: Route.LoaderArgs) {
   const urls: string[] = [];
 
   // Top page
-  urls.push(entry(baseUrl, "/share", posts.results[0]?.published_at, "daily", "1.0"));
+  urls.push(entry(baseUrl, "/share", posts.results[0]?.published_at, "weekly", "1.0"));
 
   // Article pages
   for (const post of posts.results) {

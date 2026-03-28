@@ -28,7 +28,7 @@ export function PostCard({ post, featured }: { post: Post; featured?: boolean })
               <div className="lg:w-3/5 overflow-hidden aspect-[16/9] bg-surface-container-high">
                 <img
                   src={post.thumbnail_url}
-                  alt=""
+                  alt={post.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   loading="lazy"
                 />
@@ -70,7 +70,7 @@ export function PostCard({ post, featured }: { post: Post; featured?: boolean })
           <div className="aspect-[16/10] mb-6 overflow-hidden bg-surface-container-high">
             <img
               src={post.thumbnail_url}
-              alt=""
+              alt={post.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               loading="lazy"
             />
