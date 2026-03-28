@@ -35,4 +35,18 @@ export default [
 
   // Sitemap
   route("sitemap.xml", "routes/sitemap[.]xml.tsx"),
+
+  // Auth
+  route("auth/login", "routes/auth.login.tsx"),
+  route("auth/google", "routes/auth.google.tsx"),
+  route("auth/google/callback", "routes/auth.google.callback.tsx"),
+  route("auth/twitter", "routes/auth.twitter.tsx"),
+  route("auth/twitter/callback", "routes/auth.twitter.callback.tsx"),
+  route("auth/logout", "routes/auth.logout.tsx"),
+
+  // Dashboard
+  route("dashboard", "routes/dashboard._index.tsx"),
+  route("dashboard/posts/new", "routes/dashboard.posts.new.tsx"),
+  route("dashboard/posts/:id/edit", "routes/dashboard.posts.$id.edit.tsx"),
+  route("dashboard/posts/:id/preview", "routes/dashboard.posts.$id.preview.tsx"),
 ] satisfies RouteConfig;
