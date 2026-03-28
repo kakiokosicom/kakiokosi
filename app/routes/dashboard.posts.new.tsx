@@ -5,7 +5,10 @@ import { createPost, managePostCategories } from "~/lib/db-dashboard.server";
 import { getAllCategories } from "~/lib/db.server";
 
 export function meta() {
-  return [{ title: "新規投稿 | 書き起こし.com" }];
+  return [
+    { title: "新規投稿 | 書き起こし.com" },
+    { name: "robots", content: "noindex, nofollow" },
+  ];
 }
 
 export async function loader({ request, context }: Route.LoaderArgs) {

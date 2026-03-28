@@ -1,6 +1,7 @@
 import { data, redirect, Link } from "react-router";
 import type { Route } from "./+types/share.$category.$id";
 import { getPost } from "~/lib/db.server";
+import { formatArticleContent } from "~/lib/format-content";
 
 const CATEGORY_LABELS: Record<string, string> = {
   business: "ビジネス",
@@ -92,11 +93,23 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
         datePublished: post.published_at || undefined,
         dateModified: post.updated_at || post.published_at || undefined,
         ...(post.thumbnail_url ? { image: post.thumbnail_url } : {}),
+        author: {
+          "@type": "Organization",
+          name: "書き起こし.com",
+          url: "https://kakiokosi.com",
+        },
         publisher: {
           "@type": "Organization",
           name: "書き起こし.com",
           url: "https://kakiokosi.com",
         },
+        inLanguage: "ja",
+        ...(tags.length > 0
+          ? { keywords: tags.map((t) => t.name).join(", ") }
+          : {}),
+        ...(categories.length > 0
+          ? { articleSection: categories.map((c) => c.name).join(", ") }
+          : {}),
         mainEntityOfPage: { "@type": "WebPage", "@id": articleUrl },
       },
       {
@@ -121,7 +134,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
         {/* Breadcrumb */}
         <nav aria-label="パンくずリスト" className="mb-8 text-sm text-on-surface-variant">
           <ol className="flex items-center gap-2 list-none p-0 m-0">
-            <li><Link to="/share" className="hover:text-secondary no-underline">ホー��</Link></li>
+            <li><Link to="/share" className="hover:text-secondary no-underline">ホーム</Link></li>
             <li className="before:content-['/'] before:mx-2 before:text-outline-variant">
               <Link to={`/share/category/${post.primary_category}`} className="hover:text-secondary no-underline">{categoryLabel}</Link>
             </li>
@@ -155,6 +168,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
                 width={800}
                 height={450}
                 className="w-full h-full object-cover"
+                fetchPriority="high"
               />
             </div>
           )}
@@ -167,7 +181,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
 
         <div
           className="article-content"
-          dangerouslySetInnerHTML={{ __html: post.content }}
+          dangerouslySetInnerHTML={{ __html: formatArticleContent(post.content) }}
         />
 
         {/* Tags */}

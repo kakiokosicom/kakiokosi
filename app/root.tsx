@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   isRouteErrorResponse,
   Links,
@@ -32,11 +33,11 @@ export const links: Route.LinksFunction = () => [
   },
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Work+Sans:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap",
+    href: "https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700;900&family=Work+Sans:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&display=swap",
   },
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
+    href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@24,400,0&display=swap",
   },
 ];
 
@@ -53,18 +54,16 @@ const GLOBAL_JSON_LD = {
       "@type": "WebSite",
       name: "書き起こし.com",
       url: "https://kakiokosi.com",
-      description: "講演・インタビュー・スピーチの書き起こし記事を共有するサイト",
+      description:
+        "講演・インタビュー・スピーチの書き起こし記事を共有するサイト",
       inLanguage: "ja",
-      potentialAction: {
-        "@type": "SearchAction",
-        target: "https://kakiokosi.com/share?q={search_term_string}",
-        "query-input": "required name=search_term_string",
-      },
     },
     {
       "@type": "Organization",
       name: "書き起こし.com",
       url: "https://kakiokosi.com",
+      description:
+        "講演・インタビュー・スピーチの書き起こし記事を共有するサイト",
     },
   ],
 };
@@ -94,6 +93,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 function Header({ user }: { user: SessionUser | null }) {
   const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const activeCategory = CATEGORIES.find(
     (c) =>
       location.pathname === `/share/category/${c.slug}` ||
@@ -126,8 +126,20 @@ function Header({ user }: { user: SessionUser | null }) {
           ))}
         </div>
         <div className="flex items-center gap-4">
+          {/* Mobile hamburger */}
+          <button
+            type="button"
+            className="md:hidden p-2 text-primary"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="メニュー"
+            aria-expanded={mobileMenuOpen}
+          >
+            <span className="material-symbols-outlined text-2xl">
+              {mobileMenuOpen ? "close" : "menu"}
+            </span>
+          </button>
           {user ? (
-            <div className="flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-3">
               {user.avatar_url && (
                 <img
                   src={user.avatar_url}
@@ -154,6 +166,39 @@ function Header({ user }: { user: SessionUser | null }) {
           ) : null}
         </div>
       </div>
+      {/* Mobile menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-outline-variant/20 bg-surface px-6 py-4">
+          <div className="flex flex-col gap-4">
+            {CATEGORIES.map((cat) => (
+              <Link
+                key={cat.slug}
+                to={`/share/category/${cat.slug}`}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`font-serif font-bold text-lg no-underline py-2 ${
+                  activeCategory?.slug === cat.slug
+                    ? "text-secondary"
+                    : "text-primary/80"
+                }`}
+              >
+                {cat.label}
+              </Link>
+            ))}
+            {user && (
+              <>
+                <hr className="border-outline-variant/20" />
+                <Link
+                  to="/dashboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-sm text-on-surface-variant no-underline py-2"
+                >
+                  Dashboard
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
@@ -192,6 +237,18 @@ export default function App({ loaderData }: Route.ComponentProps) {
               className="font-label text-xs uppercase tracking-widest text-white/60 hover:text-secondary no-underline transition-all"
             >
               Inquiry
+            </Link>
+            <Link
+              to="/share/company"
+              className="font-label text-xs uppercase tracking-widest text-white/60 hover:text-secondary no-underline transition-all"
+            >
+              運営情報
+            </Link>
+            <Link
+              to="/share/regal"
+              className="font-label text-xs uppercase tracking-widest text-white/60 hover:text-secondary no-underline transition-all"
+            >
+              特定商取引法
             </Link>
           </div>
           <div className="h-[1px] w-1/4 bg-primary-container" />

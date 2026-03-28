@@ -29,8 +29,11 @@ export function PostCard({ post, featured }: { post: Post; featured?: boolean })
                 <img
                   src={post.thumbnail_url}
                   alt={post.title}
+                  width={640}
+                  height={360}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  loading="lazy"
+                  loading="eager"
+                  fetchPriority="high"
                 />
               </div>
             )}
@@ -71,6 +74,8 @@ export function PostCard({ post, featured }: { post: Post; featured?: boolean })
             <img
               src={post.thumbnail_url}
               alt={post.title}
+              width={400}
+              height={250}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               loading="lazy"
             />

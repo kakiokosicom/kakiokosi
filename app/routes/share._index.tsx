@@ -5,18 +5,19 @@ import { PostCard } from "~/components/post-card";
 import { Pagination } from "~/components/pagination";
 
 export function meta() {
-  const description = "講演・インタ��ュー・スピー���の書き起こし記事を共有するサイト";
+  const description =
+    "講演・インタビュー・スピーチの書き起こし記事を共有するサイト。ビジネス、政治、社会、IT、エンターテイメントなど幅広いジャンルの書き起こしを掲載しています。";
   return [
-    { title: "書き起こし.com — 書き起こし記事アーカイブ" },
+    { title: "書き起こし.com — 講演・スピーチの書き起こし記事アーカイブ" },
     { name: "description", content: description },
     { tagName: "link", rel: "canonical", href: "https://kakiokosi.com/share" },
-    { property: "og:title", content: "書��起こし.com" },
+    { property: "og:title", content: "書き起こし.com" },
     { property: "og:description", content: description },
     { property: "og:type", content: "website" },
     { property: "og:url", content: "https://kakiokosi.com/share" },
     { property: "og:site_name", content: "書き起こし.com" },
     { name: "twitter:card", content: "summary" },
-    { name: "twitter:title", content: "��き起こし.com" },
+    { name: "twitter:title", content: "書き起こし.com" },
     { name: "twitter:description", content: description },
   ];
 }
@@ -36,11 +37,16 @@ export default function ShareIndex({ loaderData }: Route.ComponentProps) {
     <section className="max-w-5xl mx-auto">
       <header className="mb-16">
         <div className="inline-block bg-secondary-container px-3 py-1 text-[10px] font-bold tracking-[0.2em] text-on-secondary-container mb-4 uppercase">
-          Latest Transcripts
+          Transcripts Archive
         </div>
-        <h1 className="font-serif text-5xl md:text-7xl font-black text-primary tracking-tight">
-          Archives
+        <h1 className="font-serif text-4xl md:text-6xl font-black text-primary tracking-tight">
+          書き起こし記事一覧
         </h1>
+        <p className="mt-6 text-on-surface-variant text-base md:text-lg leading-relaxed max-w-2xl">
+          講演・インタビュー・スピーチの書き起こし記事を掲載しています。
+          ビジネス、政治、社会、IT、エンターテイメントなど幅広いジャンルの
+          トークを文字で読むことができます。
+        </p>
         <div className="h-1 w-24 academic-gradient mt-6" />
       </header>
 

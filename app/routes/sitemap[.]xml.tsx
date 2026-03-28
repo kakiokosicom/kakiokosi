@@ -4,7 +4,7 @@ export async function loader({ context }: Route.LoaderArgs) {
   const db = context.cloudflare.env.DB;
   const baseUrl = "https://kakiokosi.com";
 
-  const [posts, pages, categories] = await Promise.all([
+  const [posts, pages, categories, tags] = await Promise.all([
     db
       .prepare(
         `SELECT id, primary_category, published_at, updated_at FROM posts WHERE status = 'published' ORDER BY published_at DESC`
@@ -16,24 +16,30 @@ export async function loader({ context }: Route.LoaderArgs) {
     db
       .prepare(`SELECT slug FROM categories`)
       .all<{ slug: string }>(),
+    db
+      .prepare(`SELECT slug FROM tags`)
+      .all<{ slug: string }>(),
   ]);
 
   const urls: string[] = [];
 
   // Top page
-  urls.push(entry(baseUrl, "/share", posts.results[0]?.published_at, "weekly", "1.0"));
+  urls.push(entry(baseUrl, "/share", posts.results[0]?.published_at));
 
   // Article pages
   for (const post of posts.results) {
     const lastmod = post.updated_at || post.published_at;
-    urls.push(
-      entry(baseUrl, `/share/${post.primary_category}/${post.id}`, lastmod, "monthly", "0.8")
-    );
+    urls.push(entry(baseUrl, `/share/${post.primary_category}/${post.id}`, lastmod));
   }
 
   // Category pages
   for (const cat of categories.results) {
-    urls.push(entry(baseUrl, `/share/category/${cat.slug}`, null, "weekly", "0.6"));
+    urls.push(entry(baseUrl, `/share/category/${cat.slug}`, null));
+  }
+
+  // Tag pages
+  for (const tag of tags.results) {
+    urls.push(entry(baseUrl, `/share/tag/${tag.slug}`, null));
   }
 
   // Static pages (exclude login/regist/update/preparation/complete_regist)
@@ -43,7 +49,7 @@ export async function loader({ context }: Route.LoaderArgs) {
   ]);
   for (const page of pages.results) {
     if (publicPages.has(page.slug)) {
-      urls.push(entry(baseUrl, `/share/${page.slug}`, page.updated_at, "monthly", "0.5"));
+      urls.push(entry(baseUrl, `/share/${page.slug}`, page.updated_at));
     }
   }
 
@@ -63,16 +69,16 @@ ${urls.join("\n")}
 function entry(
   base: string,
   path: string,
-  lastmod: string | null,
-  changefreq: string,
-  priority: string
+  lastmod: string | null
 ): string {
+  const encodedPath = path
+    .split("/")
+    .map((segment) => encodeURIComponent(decodeURIComponent(segment)))
+    .join("/");
   const lastmodTag = lastmod
     ? `\n    <lastmod>${lastmod.substring(0, 10)}</lastmod>`
     : "";
   return `  <url>
-    <loc>${base}${path}</loc>${lastmodTag}
-    <changefreq>${changefreq}</changefreq>
-    <priority>${priority}</priority>
+    <loc>${base}${encodedPath}</loc>${lastmodTag}
   </url>`;
 }

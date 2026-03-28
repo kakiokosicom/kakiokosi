@@ -14,7 +14,10 @@ import {
 import { getAllCategories } from "~/lib/db.server";
 
 export function meta({ data }: Route.MetaArgs) {
-  return [{ title: `${data?.post?.title || "編集"} | 書き起こし.com` }];
+  return [
+    { title: `${data?.post?.title || "編集"} | 書き起こし.com` },
+    { name: "robots", content: "noindex, nofollow" },
+  ];
 }
 
 export async function loader({ request, params, context }: Route.LoaderArgs) {

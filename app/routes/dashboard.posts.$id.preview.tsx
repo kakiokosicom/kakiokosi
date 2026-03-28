@@ -4,7 +4,10 @@ import { requireAuth } from "~/lib/require-auth.server";
 import { getPostForEdit, getPostForEditAdmin } from "~/lib/db-dashboard.server";
 
 export function meta({ data }: Route.MetaArgs) {
-  return [{ title: `プレビュー: ${data?.post?.title || ""} | 書き起こし.com` }];
+  return [
+    { title: `プレビュー: ${data?.post?.title || ""} | 書き起こし.com` },
+    { name: "robots", content: "noindex, nofollow" },
+  ];
 }
 
 export async function loader({ request, params, context }: Route.LoaderArgs) {

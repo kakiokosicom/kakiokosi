@@ -6,7 +6,13 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   const db = context.cloudflare.env.DB;
   const url = new URL(request.url);
   const slug = url.pathname.replace(/^\/share\//, "").replace(/\/$/, "");
-  const page = await getPage(db, slug);
+  let page;
+  try {
+    page = await getPage(db, slug);
+  } catch {
+    // pages table may not exist yet — treat as 404
+    throw data("ページが見つかりません", { status: 404 });
+  }
   if (!page) {
     throw data("ページが見つかりません", { status: 404 });
   }
@@ -29,19 +35,19 @@ const PAGE_DESCRIPTIONS: Record<string, string> = {
   webmeeting: "Web会議の書き起こしについて",
 };
 
-export function meta({ data: loaderData, request }: Route.MetaArgs) {
+export function meta({ data: loaderData, location }: Route.MetaArgs) {
   const title = loaderData?.page?.title ?? "ページ";
-  const url = new URL(request.url);
-  const slug = url.pathname.replace(/^\/share\//, "").replace(/\/$/, "");
+  const slug = location.pathname.replace(/^\/share\//, "").replace(/\/$/, "");
   const description = PAGE_DESCRIPTIONS[slug] || `${title} — 書き起こし.com`;
+  const canonicalUrl = `https://kakiokosi.com${location.pathname}`;
   return [
     { title: `${title} | 書き起こし.com` },
     { name: "description", content: description },
-    { tagName: "link", rel: "canonical", href: `https://kakiokosi.com${url.pathname}` },
+    { tagName: "link", rel: "canonical", href: canonicalUrl },
     { property: "og:title", content: `${title} | 書き起こし.com` },
     { property: "og:description", content: description },
     { property: "og:type", content: "website" },
-    { property: "og:url", content: `https://kakiokosi.com${url.pathname}` },
+    { property: "og:url", content: canonicalUrl },
     { property: "og:site_name", content: "書き起こし.com" },
     { name: "twitter:card", content: "summary" },
     { name: "twitter:title", content: `${title} | 書き起こし.com` },

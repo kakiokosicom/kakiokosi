@@ -23,6 +23,9 @@ export default [
   route("share/omitsumori", "routes/share.static.tsx", { id: "share-omitsumori" }),
   route("share/point", "routes/share.static.tsx", { id: "share-point" }),
 
+  // Pagination
+  route("share/page/:page", "routes/share.page.$page.tsx"),
+
   // Category listing
   route("share/category/:slug", "routes/share.category.$slug.tsx"),
   route("share/category/:slug/page/:page", "routes/share.category.$slug.page.$page.tsx"),
