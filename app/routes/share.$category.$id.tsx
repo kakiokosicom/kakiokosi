@@ -90,8 +90,8 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
         headline: post.title,
         description: post.excerpt || post.title,
         url: articleUrl,
-        datePublished: post.published_at || undefined,
-        dateModified: post.updated_at || post.published_at || undefined,
+        datePublished: post.published_at?.replace(" ", "T") || undefined,
+        dateModified: (post.updated_at || post.published_at)?.replace(" ", "T") || undefined,
         ...(post.thumbnail_url ? { image: post.thumbnail_url } : {}),
         author: {
           "@type": "Organization",
