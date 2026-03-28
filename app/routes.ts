@@ -32,4 +32,7 @@ export default [
 
   // Article page (must be after static pages to avoid conflicts)
   route("share/:category/:id", "routes/share.$category.$id.tsx"),
+
+  // Sitemap
+  route("sitemap.xml", "routes/sitemap[.]xml.tsx"),
 ] satisfies RouteConfig;
