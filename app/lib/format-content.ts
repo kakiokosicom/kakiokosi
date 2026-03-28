@@ -16,6 +16,12 @@ export function formatArticleContent(html: string): string {
   content = content.replace(/\\+$/g, "");
   content = content.replace(/\\"/g, '"');
 
+  // Upgrade all http:// to https:// to prevent mixed content warnings
+  content = content.replace(/http:\/\//g, "https://");
+
+  // Normalize www.kakiokosi.com → kakiokosi.com
+  content = content.replace(/https:\/\/www\.kakiokosi\.com\//g, "https://kakiokosi.com/");
+
   // Rewrite legacy wp-content/uploads paths to /uploads/
   content = content.replace(
     /https?:\/\/(?:www\.)?kakiokosi\.com\/wp-content\/uploads\//g,
