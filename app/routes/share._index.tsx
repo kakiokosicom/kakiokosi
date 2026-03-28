@@ -19,11 +19,11 @@ export function meta() {
     { property: "og:url", content: "https://kakiokosi.com/share" },
     { property: "og:site_name", content: "書き起こし.com" },
     { property: "og:locale", content: "ja_JP" },
-    { property: "og:image", content: "https://kakiokosi.com/images/default-og.svg" },
+    { property: "og:image", content: "https://kakiokosi.com/images/default-og.png" },
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: "書き起こし.com" },
     { name: "twitter:description", content: description },
-    { name: "twitter:image", content: "https://kakiokosi.com/images/default-og.svg" },
+    { name: "twitter:image", content: "https://kakiokosi.com/images/default-og.png" },
   ];
 }
 
@@ -35,8 +35,10 @@ export async function loader({ context }: Route.LoaderArgs) {
 
 export default function ShareIndex({ loaderData }: Route.ComponentProps) {
   const { posts, totalPages, total } = loaderData;
-  const featured = posts[0];
-  const rest = posts.slice(1);
+  // Prefer a post with thumbnail as the featured card for visual impact
+  const featuredIdx = posts.findIndex((p) => p.thumbnail_url);
+  const featured = featuredIdx >= 0 ? posts[featuredIdx] : posts[0];
+  const rest = posts.filter((_, i) => i !== (featuredIdx >= 0 ? featuredIdx : 0));
 
   return (
     <section className="max-w-5xl mx-auto">
