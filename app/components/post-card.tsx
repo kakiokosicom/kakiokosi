@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import type { PostSummary } from "~/lib/db.server";
+import { imageSrcSet, imageSrc } from "~/lib/image";
 
 const CATEGORY_LABELS: Record<string, string> = {
   business: "ビジネス",
@@ -27,7 +28,9 @@ export function PostCard({ post, featured }: { post: PostSummary; featured?: boo
             {post.thumbnail_url && (
               <div className="lg:w-3/5 overflow-hidden aspect-[16/9] bg-surface-container-high">
                 <img
-                  src={post.thumbnail_url}
+                  src={imageSrc(post.thumbnail_url, 640)}
+                  srcSet={imageSrcSet(post.thumbnail_url, [320, 640, 960])}
+                  sizes="(max-width: 768px) 100vw, 60vw"
                   alt={post.title}
                   width={640}
                   height={360}
@@ -72,7 +75,9 @@ export function PostCard({ post, featured }: { post: PostSummary; featured?: boo
         {post.thumbnail_url && (
           <div className="aspect-[16/10] mb-6 overflow-hidden bg-surface-container-high">
             <img
-              src={post.thumbnail_url}
+              src={imageSrc(post.thumbnail_url, 400)}
+              srcSet={imageSrcSet(post.thumbnail_url, [320, 400, 640])}
+              sizes="(max-width: 768px) 100vw, 50vw"
               alt={post.title}
               width={400}
               height={250}

@@ -4,6 +4,7 @@ import { getPost, getRelatedPosts } from "~/lib/db.server";
 import type { Post, PostSummary } from "~/lib/db.server";
 import { formatArticleContent } from "~/lib/format-content";
 import { Icon } from "~/components/icon";
+import { imageSrcSet, imageSrc } from "~/lib/image";
 
 const CATEGORY_LABELS: Record<string, string> = {
   business: "ビジネス",
@@ -190,7 +191,9 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
           {post.thumbnail_url && (
             <div className="aspect-[16/9] w-full overflow-hidden rounded-xl bg-surface-container mb-12">
               <img
-                src={post.thumbnail_url}
+                src={imageSrc(post.thumbnail_url, 800)}
+                srcSet={imageSrcSet(post.thumbnail_url, [480, 800, 1200])}
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 75vw, 800px"
                 alt={post.title}
                 width={800}
                 height={450}
@@ -244,8 +247,12 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
                   {related.thumbnail_url && (
                     <div className="aspect-[16/10] mb-4 overflow-hidden bg-surface-container-high rounded-lg">
                       <img
-                        src={related.thumbnail_url}
+                        src={imageSrc(related.thumbnail_url, 400)}
+                        srcSet={imageSrcSet(related.thumbnail_url, [320, 400])}
+                        sizes="(max-width: 768px) 100vw, 50vw"
                         alt={related.title}
+                        width={400}
+                        height={250}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         loading="lazy"
                       />
