@@ -60,10 +60,15 @@ const GLOBAL_JSON_LD = {
     },
     {
       "@type": "Organization",
+      "@id": "https://kakiokosi.com/#organization",
       name: "書き起こし.com",
       url: "https://kakiokosi.com",
       description:
         "講演・インタビュー・スピーチの書き起こし記事を共有するサイト",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://kakiokosi.com/favicon.ico",
+      },
     },
   ],
 };
@@ -253,7 +258,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
           </div>
           <div className="h-[1px] w-1/4 bg-primary-container" />
           <p className="font-label text-[10px] uppercase tracking-widest text-white/40">
-            &copy; 2012–{new Date().getFullYear()} 書き起こし.com. All rights reserved.
+            &copy; 2011–{new Date().getFullYear()} 書き起こし.com. All rights reserved.
           </p>
         </div>
       </footer>

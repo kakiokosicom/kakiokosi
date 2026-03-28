@@ -1,6 +1,7 @@
 import { data, redirect, Link } from "react-router";
 import type { Route } from "./+types/share.$category.$id";
-import { getPost } from "~/lib/db.server";
+import { getPost, getRelatedPosts } from "~/lib/db.server";
+import type { Post } from "~/lib/db.server";
 import { formatArticleContent } from "~/lib/format-content";
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -37,7 +38,9 @@ export async function loader({ params, context }: Route.LoaderArgs) {
     return redirect(`/share/${post.primary_category}/${post.id}`, 301);
   }
 
-  return { post, categories, tags };
+  const relatedPosts = await getRelatedPosts(db, id, post.primary_category, 4);
+
+  return { post, categories, tags, relatedPosts };
 }
 
 export function meta({ data: loaderData }: Route.MetaArgs) {
@@ -73,7 +76,7 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
 }
 
 export default function ArticlePage({ loaderData }: Route.ComponentProps) {
-  const { post, categories, tags } = loaderData;
+  const { post, categories, tags, relatedPosts } = loaderData;
   const date = post.published_at
     ? new Date(post.published_at).toLocaleDateString("ja-JP")
     : "";
@@ -204,6 +207,41 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
               ))}
             </div>
           </footer>
+        )}
+
+        {/* Related Articles */}
+        {relatedPosts.length > 0 && (
+          <section className="mt-20 pt-12 border-t border-outline-variant/20">
+            <h2 className="font-serif text-2xl font-bold text-primary mb-8">
+              関連する書き起こし記事
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {relatedPosts.map((related) => (
+                <Link
+                  key={related.id}
+                  to={`/share/${related.primary_category}/${related.id}`}
+                  className="group block no-underline"
+                >
+                  {related.thumbnail_url && (
+                    <div className="aspect-[16/10] mb-4 overflow-hidden bg-surface-container-high rounded-lg">
+                      <img
+                        src={related.thumbnail_url}
+                        alt={related.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+                  <time className="text-[10px] text-on-surface-variant">
+                    {related.published_at ? new Date(related.published_at).toLocaleDateString("ja-JP") : ""}
+                  </time>
+                  <h3 className="font-serif text-lg font-bold text-primary group-hover:text-secondary transition-colors mt-1 leading-snug">
+                    {related.title}
+                  </h3>
+                </Link>
+              ))}
+            </div>
+          </section>
         )}
       </article>
 

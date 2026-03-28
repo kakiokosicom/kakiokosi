@@ -183,4 +183,22 @@ export async function getAllCategories(
   return result.results;
 }
 
+export async function getRelatedPosts(
+  db: D1Database,
+  postId: number,
+  categorySlug: string,
+  limit = 4
+): Promise<Post[]> {
+  const result = await db
+    .prepare(
+      `SELECT p.* FROM posts p
+       JOIN post_categories pc ON p.id = pc.post_id
+       WHERE pc.category_slug = ? AND p.id != ? AND p.status = 'published'
+       ORDER BY p.published_at DESC LIMIT ?`
+    )
+    .bind(categorySlug, postId, limit)
+    .all<Post>();
+  return result.results;
+}
+
 export { POSTS_PER_PAGE };

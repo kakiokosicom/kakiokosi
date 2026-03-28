@@ -10,7 +10,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   society: "社会",
   world: "海外",
   it: "IT",
-  entertainment: "��ンターテイメント",
+  entertainment: "エンターテイメント",
 };
 
 const CATEGORY_LABELS_EN: Record<string, string> = {
@@ -20,6 +20,15 @@ const CATEGORY_LABELS_EN: Record<string, string> = {
   world: "Foreign",
   it: "IT",
   entertainment: "Entertainment",
+};
+
+const CATEGORY_DESCRIPTIONS: Record<string, string> = {
+  business: "経営者の講演、スタートアップのピッチ、TED Talksのビジネス系プレゼンテーションなど、ビジネスに関する書き起こし記事をまとめています。",
+  politics: "政治家の記者会見、国会答弁、政策発表など、政治に関する発言の書き起こし記事をまとめています。",
+  society: "社会問題に関する講演、TED Talks、記者会見など、社会をテーマにした書き起こし記事をまとめています。",
+  world: "海外の著名人によるスピーチ、国際会議での発言、海外メディアのインタビューなどの書き起こし記事をまとめています。",
+  it: "テクノロジー企業のプレゼンテーション、IT業界のカンファレンス、技術者の講演などの書き起こし記事をまとめています。",
+  entertainment: "芸能人の記者会見、アーティストのインタビュー、エンターテイメント業界に関する書き起こし記事をまとめています。",
 };
 
 export async function loader({ params, context }: Route.LoaderArgs) {
@@ -40,7 +49,7 @@ export async function loader({ params, context }: Route.LoaderArgs) {
 export function meta({ data: loaderData }: Route.MetaArgs) {
   const name = loaderData?.category?.name ?? "";
   const slug = loaderData?.category?.slug ?? "";
-  const description = `${name}カテゴリの書き起こ��記事一覧 — 講演・インタビュー・スピーチのテキスト`;
+  const description = `${name}カテゴリの書き起こし記事一覧 — 講演・インタビュー・スピーチのテキスト`;
   const url = `https://kakiokosi.com/share/category/${slug}`;
   return [
     { title: `${name}の書き起こし記事一覧 | 書き起こし.com` },
@@ -76,6 +85,11 @@ export default function CategoryPage({ loaderData }: Route.ComponentProps) {
         </h1>
         <p className="font-label text-sm text-on-surface-variant mt-2">{labelEn}</p>
         <div className="h-1 w-24 academic-gradient mt-6" />
+        {CATEGORY_DESCRIPTIONS[category.slug] && (
+          <p className="mt-6 text-on-surface-variant leading-relaxed max-w-2xl">
+            {CATEGORY_DESCRIPTIONS[category.slug]}
+          </p>
+        )}
       </header>
 
       {featured && <PostCard post={featured} featured />}
