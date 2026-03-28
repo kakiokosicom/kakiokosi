@@ -58,7 +58,9 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
     { property: "og:url", content: url },
     { property: "og:site_name", content: "書き起こし.com" },
     { property: "og:locale", content: "ja_JP" },
-    { name: "twitter:card", content: "summary" },
+    { property: "og:image", content: "https://kakiokosi.com/images/default-og.png" },
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:image", content: "https://kakiokosi.com/images/default-og.png" },
   ];
 }
 
