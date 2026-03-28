@@ -87,6 +87,10 @@ const GLOBAL_JSON_LD = {
         email: "info@kakiokosi.com",
         availableLanguage: "Japanese",
       },
+      sameAs: [
+        "https://x.com/paji_a",
+        "https://note.com/hajimeataka",
+      ],
     },
   ],
 };
