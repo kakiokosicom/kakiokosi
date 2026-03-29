@@ -18,15 +18,6 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    // www → non-www 301 redirect
-    if (url.hostname === "www.kakiokosi.com") {
-      url.hostname = "kakiokosi.com";
-      return new Response(null, {
-        status: 301,
-        headers: { Location: url.toString() },
-      });
-    }
-
     const response = await requestHandler(request, {
       cloudflare: { env, ctx },
     });
