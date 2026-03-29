@@ -16,11 +16,20 @@ const requestHandler = createRequestHandler(
 
 export default {
   async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+
+    // www → non-www 301 redirect
+    if (url.hostname === "www.kakiokosi.com") {
+      url.hostname = "kakiokosi.com";
+      return new Response(null, {
+        status: 301,
+        headers: { Location: url.toString() },
+      });
+    }
+
     const response = await requestHandler(request, {
       cloudflare: { env, ctx },
     });
-
-    const url = new URL(request.url);
 
     // Immutable cache for hashed static assets and uploaded images
     if (url.pathname.startsWith("/assets/") || url.pathname.startsWith("/uploads/")) {
@@ -50,7 +59,7 @@ export default {
     );
     response.headers.set(
       "Content-Security-Policy",
-      "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+      "default-src 'self'; script-src 'self' 'unsafe-inline' https://analytics.ahrefs.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data:; connect-src 'self' https://analytics.ahrefs.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
     );
 
     return response;
