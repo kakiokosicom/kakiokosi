@@ -27,6 +27,17 @@ function generateExcerpt(html: string, fallback: string): string {
   return target.substring(0, 140) + "…";
 }
 
+const CATEGORY_ICONS: Record<string, string> = {
+  business: "💼",
+  politics: "🏛️",
+  society: "🌐",
+  world: "✈️",
+  it: "💻",
+  entertainment: "🎭",
+  economy: "💰",
+  culture: "🎨",
+};
+
 const CATEGORY_LABELS: Record<string, string> = {
   business: "ビジネス",
   politics: "政治",
@@ -403,10 +414,16 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
                         loading="lazy"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-surface-container text-on-surface-variant/30">
-                        <svg viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12">
-                          <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z" />
-                        </svg>
+                      <div className="w-full h-full academic-gradient flex flex-col justify-between p-4 relative overflow-hidden">
+                        <div className="absolute -right-4 -top-4 opacity-[0.07] text-[5rem]">
+                          {CATEGORY_ICONS[related.primary_category] || "📝"}
+                        </div>
+                        <span className="font-label text-[9px] tracking-[0.2em] text-secondary-container/80 uppercase">
+                          {CATEGORY_LABELS[related.primary_category] ?? related.primary_category}
+                        </span>
+                        <p className="font-serif text-sm font-bold text-white/90 leading-snug line-clamp-3">
+                          {related.title}
+                        </p>
                       </div>
                     )}
                   </div>
