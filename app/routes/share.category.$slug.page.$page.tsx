@@ -59,7 +59,10 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
     { property: "og:site_name", content: "書き起こし.com" },
     { property: "og:locale", content: "ja_JP" },
     { property: "og:image", content: "https://kakiokosi.com/images/default-og.png" },
+    { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: `${name} - ${page}ページ目 | 書き起こし.com` },
+    { name: "twitter:description", content: description },
     { name: "twitter:image", content: "https://kakiokosi.com/images/default-og.png" },
   ];
 }
