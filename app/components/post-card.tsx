@@ -26,6 +26,25 @@ const CATEGORY_LABELS: Record<string, string> = {
   etc: "その他",
 };
 
+function TextThumbnail({ title, category, size = "md" }: { title: string; category: string; size?: "lg" | "md" }) {
+  const icon = CATEGORY_ICONS[category] || "📝";
+  const label = CATEGORY_LABELS[category] ?? category;
+  const isLg = size === "lg";
+  return (
+    <div className="w-full h-full academic-gradient flex flex-col justify-between p-6 md:p-8 relative overflow-hidden">
+      <div className="absolute -right-8 -top-8 opacity-[0.07]">
+        <span className={isLg ? "text-[10rem]" : "text-[8rem]"}>{icon}</span>
+      </div>
+      <span className={`font-label ${isLg ? "text-xs" : "text-[10px]"} tracking-[0.2em] text-secondary-container/80 uppercase`}>
+        {label}
+      </span>
+      <p className={`font-serif ${isLg ? "text-xl md:text-2xl" : "text-base md:text-lg"} font-bold text-white/90 leading-snug ${isLg ? "line-clamp-4" : "line-clamp-3"}`}>
+        {title}
+      </p>
+    </div>
+  );
+}
+
 export function PostCard({ post, featured }: { post: PostSummary; featured?: boolean }) {
   const date = post.published_at
     ? new Date(post.published_at).toLocaleDateString("ja-JP")
@@ -54,9 +73,7 @@ export function PostCard({ post, featured }: { post: PostSummary; featured?: boo
                   fetchPriority="high"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-primary-container/20">
-                  <span className="text-6xl">{CATEGORY_ICONS[post.primary_category] || "📝"}</span>
-                </div>
+                <TextThumbnail title={post.title} category={post.primary_category} size="lg" />
               )}
             </div>
             <div className="lg:w-2/5 flex flex-col justify-center">
@@ -104,9 +121,7 @@ export function PostCard({ post, featured }: { post: PostSummary; featured?: boo
               loading="lazy"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-primary-container/20">
-              <span className="text-4xl">{CATEGORY_ICONS[post.primary_category] || "📝"}</span>
-            </div>
+            <TextThumbnail title={post.title} category={post.primary_category} />
           )}
         </div>
         <div className="flex items-center gap-4 mb-3">
