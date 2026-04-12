@@ -3,6 +3,10 @@
   "name": "kakiokosi",
   "compatibility_date": "2025-04-04",
   "main": "./workers/app.ts",
+  "triggers": {
+    // Auto-publish 1 IT draft every 3 days at 00:00 UTC (09:00 JST)
+    "crons": ["0 0 */3 * *"]
+  },
   "d1_databases": [
     {
       "binding": "DB",

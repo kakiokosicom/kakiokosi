@@ -163,7 +163,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "ホーム", item: "https://kakiokosi.com/share" },
+          { "@type": "ListItem", position: 1, name: "ホーム", item: "https://kakiokosi.com/" },
           { "@type": "ListItem", position: 2, name: categoryLabel, item: `https://kakiokosi.com/share/category/${post.primary_category}` },
           { "@type": "ListItem", position: 3, name: post.title },
         ],

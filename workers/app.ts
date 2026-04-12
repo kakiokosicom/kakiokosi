@@ -15,6 +15,24 @@ const requestHandler = createRequestHandler(
 );
 
 export default {
+  /**
+   * Scheduled handler — publishes the oldest IT draft post.
+   * Cron schedule: every 3 days at 09:00 JST (00:00 UTC).
+   */
+  async scheduled(_event, env, _ctx) {
+    const result = await env.DB.prepare(
+      `UPDATE posts SET status = 'published',
+       published_at = datetime('now', '+9 hours'),
+       updated_at = datetime('now', '+9 hours')
+       WHERE id = (
+         SELECT id FROM posts
+         WHERE status = 'draft' AND primary_category = 'it'
+         ORDER BY id ASC LIMIT 1
+       )`
+    ).run();
+    console.log(`Auto-publish IT draft: changes=${result.meta.changes}`);
+  },
+
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 

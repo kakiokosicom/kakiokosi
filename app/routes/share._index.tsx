@@ -12,11 +12,11 @@ export function meta() {
   return [
     { title: "書き起こし.com — 講演・スピーチの書き起こし記事アーカイブ" },
     { name: "description", content: description },
-    { tagName: "link", rel: "canonical", href: "https://kakiokosi.com/share" },
+    { tagName: "link", rel: "canonical", href: "https://kakiokosi.com/" },
     { property: "og:title", content: "書き起こし.com" },
     { property: "og:description", content: description },
     { property: "og:type", content: "website" },
-    { property: "og:url", content: "https://kakiokosi.com/share" },
+    { property: "og:url", content: "https://kakiokosi.com/" },
     { property: "og:site_name", content: "書き起こし.com" },
     { property: "og:locale", content: "ja_JP" },
     { property: "og:image", content: "https://kakiokosi.com/images/default-og.png" },
@@ -45,7 +45,7 @@ export default function ShareIndex({ loaderData }: Route.ComponentProps) {
       <JsonLd data={collectionPageSchema({
         name: "書き起こし記事一覧",
         description: "講演・インタビュー・スピーチの書き起こし記事を共有するサイト",
-        url: "https://kakiokosi.com/share",
+        url: "https://kakiokosi.com/",
         numberOfItems: total,
       })} />
       <header className="mb-16">
