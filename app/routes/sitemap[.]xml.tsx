@@ -37,8 +37,8 @@ export async function loader({ context }: Route.LoaderArgs) {
 
   const urls: string[] = [];
 
-  // Top page — use most recent updated_at
-  urls.push(entry(baseUrl, "/share", posts.results[0]?.updated_at || posts.results[0]?.published_at));
+  // Top page — use most recent updated_at (canonical is /)
+  urls.push(entry(baseUrl, "/", posts.results[0]?.updated_at || posts.results[0]?.published_at));
 
   // Article pages
   for (const post of posts.results) {

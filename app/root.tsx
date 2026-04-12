@@ -108,9 +108,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(GLOBAL_JSON_LD) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            ...GLOBAL_JSON_LD,
+            "@graph": GLOBAL_JSON_LD["@graph"].map((item) =>
+              item["@type"] === "WebSite"
+                ? { ...item, dateModified: new Date().toISOString().split("T")[0] }
+                : item
+            ),
+          }) }}
         />
         <script src="https://analytics.ahrefs.com/analytics.js" data-key="aaFaPDyRTwlvToTCpke9pg" async />
+        <script dangerouslySetInnerHTML={{ __html: `(function(){var u=navigator.userAgent||"";var bots=["ChatGPT-User","OAI-SearchBot","GPTBot","Google-Extended","PerplexityBot","ClaudeBot","Applebot-Extended","CCBot","cohere-ai","Bytespider","anthropic-ai","Google-Agent"];var m=bots.find(function(b){return u.indexOf(b)!==-1});if(m){document.documentElement.dataset.aiBot=m}})();` }} />
       </head>
       <body className="bg-surface text-on-surface font-sans">
         {children}
@@ -239,7 +247,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
         <Outlet />
       </main>
       <footer className="academic-gradient text-white py-16 mt-20">
-        <div className="max-w-7xl mx-auto px-8 flex flex-col items-center gap-12">
+        <div className="max-w-7xl mx-auto px-6 md:px-8 flex flex-col items-center gap-12">
           <div className="font-serif text-3xl font-black">書き起こし.com</div>
           <div className="flex flex-wrap justify-center gap-x-12 gap-y-6">
             <Link
@@ -279,6 +287,30 @@ export default function App({ loaderData }: Route.ComponentProps) {
               特定商取引法
             </Link>
           </div>
+          <form
+            action="https://www.google.com/search"
+            method="get"
+            // @ts-expect-error WebMCP attributes
+            toolname="search_articles"
+            tooldescription="書き起こし.comの記事をキーワードで検索します"
+            className="w-full max-w-md"
+          >
+            <input type="hidden" name="sitesearch" value="kakiokosi.com" />
+            <div className="flex gap-2">
+              <input
+                type="search"
+                name="q"
+                placeholder="記事を検索..."
+                className="flex-1 px-4 py-2 rounded-full bg-white/10 text-white placeholder-white/40 border border-white/20 text-sm focus:outline-none focus:border-secondary"
+              />
+              <button
+                type="submit"
+                className="px-5 py-2 rounded-full bg-secondary text-on-secondary text-sm font-bold hover:bg-secondary/90 transition-colors"
+              >
+                検索
+              </button>
+            </div>
+          </form>
           <div className="h-[1px] w-1/4 bg-primary-container" />
           <div className="text-center text-white/30 text-[10px] leading-relaxed">
             <p>運営: 株式会社ユリカ（YURIKA, K.K.）</p>

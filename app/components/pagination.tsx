@@ -20,7 +20,7 @@ export function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps
   }
 
   return (
-    <nav className="mt-24 flex items-center justify-center gap-4" aria-label="ページネーション">
+    <nav className="mt-24 flex flex-wrap items-center justify-center gap-3 md:gap-4" aria-label="ページネーション">
       {currentPage > 1 && (
         <Link
           to={currentPage === 2 ? baseUrl : `${baseUrl}/page/${currentPage - 1}`}
