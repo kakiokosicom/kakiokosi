@@ -24,6 +24,7 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
     { title: `書き起こし記事一覧 - ${page}ページ目 | 書き起こし.com` },
     { name: "description", content: description },
     { tagName: "link", rel: "canonical", href: url },
+    { name: "robots", content: "noindex, follow" },
     { property: "og:title", content: `書き起こし.com - ${page}ページ目` },
     { property: "og:description", content: description },
     { property: "og:url", content: url },

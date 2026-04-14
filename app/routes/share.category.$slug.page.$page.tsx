@@ -53,6 +53,7 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
     { title: `${name}の書き起こし記事 - ${page}ページ目 | 書き起こし.com` },
     { name: "description", content: description },
     { tagName: "link", rel: "canonical", href: url },
+    { name: "robots", content: "noindex, follow" },
     { property: "og:title", content: `${name} - ${page}ページ目 | 書き起こし.com` },
     { property: "og:description", content: description },
     { property: "og:url", content: url },

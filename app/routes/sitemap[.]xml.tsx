@@ -30,7 +30,7 @@ export async function loader({ context }: Route.LoaderArgs) {
          JOIN post_tags pt ON pt.tag_slug = t.slug
          JOIN posts p ON p.id = pt.post_id AND p.status = 'published'
          GROUP BY t.slug
-         HAVING COUNT(pt.post_id) >= 5`
+         HAVING COUNT(pt.post_id) >= 15`
       )
       .all<{ slug: string; lastmod: string | null }>(),
   ]);
@@ -51,7 +51,7 @@ export async function loader({ context }: Route.LoaderArgs) {
     urls.push(entry(baseUrl, `/share/category/${cat.slug}`, cat.lastmod ?? null));
   }
 
-  // Tag pages (only tags with 5+ articles)
+  // Tag pages (only tags with 15+ articles)
   for (const tag of tags.results) {
     urls.push(entry(baseUrl, `/share/tag/${tag.slug}`, tag.lastmod ?? null));
   }
