@@ -7,7 +7,7 @@ import { JsonLd } from "~/components/json-ld";
 import { collectionPageSchema } from "~/lib/schema";
 
 /** Minimum number of articles for a tag page to be indexed by search engines. */
-const MIN_ARTICLES_FOR_INDEX = 5;
+const MIN_ARTICLES_FOR_INDEX = 15;
 
 export async function loader({ params, context }: Route.LoaderArgs) {
   const db = context.cloudflare.env.DB;
