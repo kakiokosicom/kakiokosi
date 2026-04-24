@@ -33,7 +33,9 @@ html,
 body {
   background-color: var(--color-surface);
   color: var(--color-on-surface);
-  overflow-x: hidden;
+  /* `clip` prevents horizontal overflow without creating a scroll container,
+     so descendant `position: sticky` keeps working. `hidden` would break it. */
+  overflow-x: clip;
 }
 
 ::selection {

@@ -27,7 +27,7 @@ export function AppPromo() {
         </span>
       </div>
 
-      <div className="relative grid md:grid-cols-[1.05fr_1fr] gap-0 items-stretch">
+      <div className="relative grid md:grid-cols-[1.05fr_1fr] gap-0 items-center">
         {/* Copy */}
         <div className="p-8 md:p-10 lg:p-12 flex flex-col justify-center">
           <p className="font-label text-[11px] tracking-[0.3em] uppercase text-white/50 mb-4">
@@ -95,8 +95,8 @@ export function AppPromo() {
           </div>
         </div>
 
-        {/* Image */}
-        <div className="relative bg-[#050E1C] md:min-h-[360px]">
+        {/* Image — natural aspect, no crop */}
+        <div className="relative bg-[#050E1C]">
           <picture>
             <source
               media="(min-width: 768px)"
@@ -109,7 +109,7 @@ export function AppPromo() {
               height={868}
               loading="lazy"
               decoding="async"
-              className="w-full h-full object-cover md:object-center"
+              className="block w-full h-auto"
             />
           </picture>
         </div>
