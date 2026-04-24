@@ -4,6 +4,7 @@ import { getPost, getRelatedPosts } from "~/lib/db.server";
 import type { Post, PostSummary } from "~/lib/db.server";
 import { formatArticleContent } from "~/lib/format-content";
 import { Icon } from "~/components/icon";
+import { AppPromo, AppPromoSidebar } from "~/components/app-promo";
 import { imageSrcSet, imageSrc } from "~/lib/image";
 import { getAuthor, authorJsonLd } from "~/lib/authors";
 
@@ -312,6 +313,9 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
           </div>
         )}
 
+        {/* Sponsored app promo */}
+        <AppPromo />
+
         {/* Tags */}
         {tags.length > 0 && (
           <footer className="mt-20 pt-8 border-t border-outline-variant/20">
@@ -464,6 +468,9 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
               ))}
             </nav>
           </div>
+
+          {/* Sponsored */}
+          <AppPromoSidebar />
 
           {/* About */}
           <div className="p-8 bg-primary-container text-white rounded-xl relative overflow-hidden">
