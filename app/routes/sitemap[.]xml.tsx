@@ -63,7 +63,6 @@ export async function loader({ context }: Route.LoaderArgs) {
     "kakiokoshi-toha", "mojikoshi-tool", "gijiroku", "meispeech",
     "interview-kakiokoshi", "ted-talks", "mojikoshi-fukugyo", "presentation",
     "kigyoka-meigen", "ai-hatarakikata", "seijika-enzetsu",
-    "captio-alternative-email-memo",
   ]);
   for (const page of pages.results) {
     if (publicPages.has(page.slug)) {
