@@ -60,6 +60,10 @@ export async function loader({ context }: Route.LoaderArgs) {
   const publicPages = new Set([
     "about", "tos", "privacy", "regal", "company", "contact",
     "technique", "tapeokoshi", "jirei", "nagare", "omitsumori", "point", "webmeeting",
+    "kakiokoshi-toha", "mojikoshi-tool", "gijiroku", "meispeech",
+    "interview-kakiokoshi", "ted-talks", "mojikoshi-fukugyo", "presentation",
+    "kigyoka-meigen", "ai-hatarakikata", "seijika-enzetsu",
+    "captio-alternative-email-memo",
   ]);
   for (const page of pages.results) {
     if (publicPages.has(page.slug)) {

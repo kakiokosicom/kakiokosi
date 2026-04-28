@@ -28,6 +28,7 @@ export default [
   route("share/kigyoka-meigen", "routes/share.static.tsx", { id: "share-kigyoka-meigen" }),
   route("share/ai-hatarakikata", "routes/share.static.tsx", { id: "share-ai-hatarakikata" }),
   route("share/seijika-enzetsu", "routes/share.static.tsx", { id: "share-seijika-enzetsu" }),
+  route("share/captio-alternative-email-memo", "routes/share.static.tsx", { id: "share-captio-alternative-email-memo" }),
   route("share/tapeokoshi", "routes/share.static.tsx", { id: "share-tapeokoshi" }),
   route("share/jirei", "routes/share.static.tsx", { id: "share-jirei" }),
   route("share/nagare", "routes/share.static.tsx", { id: "share-nagare" }),

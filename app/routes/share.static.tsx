@@ -39,6 +39,7 @@ const PAGE_DESCRIPTIONS: Record<string, string> = {
   "kigyoka-meigen": "起業家・経営者の名言・名スピーチまとめ。ジョブズ、堀江貴文、孫正義、ザッカーバーグなど、ビジネスリーダーの言葉を全文書き起こしで読めます。",
   "ai-hatarakikata": "AI時代の働き方まとめ。AIエージェント、自動化、新しい組織設計など、AI革命が仕事に与える影響を最新のトーク書き起こしから読み解きます。",
   "seijika-enzetsu": "政治家の演説・国会答弁まとめ。オバマ大統領、橋下徹、国会事故調など、歴史に残る政治スピーチと国会質疑の全文書き起こしアーカイブ。",
+  "captio-alternative-email-memo": "Captio終了後に「自分にメールするメモ」を続けたい人向けに、iPhoneで使える代替方法を比較。メールメモ、会議メモ、音声メモ、文字起こし前の一時保存に向いた使い方も解説します。",
   technique: "書き起こしの技術・テクニックについて",
   tapeokoshi: "テープ起こしの基本と方法について",
   jirei: "書き起こしの事例紹介",
@@ -76,6 +77,39 @@ const PAGE_SCHEMA_TYPES: Record<string, string> = {
   contact: "ContactPage",
 };
 
+/** Slugs that should render as Article (with datePublished etc.) instead of WebPage. */
+const ARTICLE_SLUGS = new Set(["captio-alternative-email-memo"]);
+
+/** FAQ items keyed by slug — extracted from the page body so structured data and visible content stay in sync. */
+const FAQ_ITEMS_BY_SLUG: Record<string, { question: string; answer: string }[]> = {
+  "captio-alternative-email-memo": [
+    {
+      question: "Captioはもう使えないのですか？",
+      answer: "Captioは以前のようなクラウド同期・メール送信サービスとしては従来通りに利用できないという報告があり、同じ体験を求める人は代替手段を探す必要があります。",
+    },
+    {
+      question: "Captioの代替には何が必要ですか？",
+      answer: "「すぐ書ける」「自分にメールできる」「あとで受信箱で処理できる」の3つが揃っていることが重要です。機能数の多さよりも、起動から送信までの動線の短さで選ぶのが向いています。",
+    },
+    {
+      question: "Apple純正メモではだめですか？",
+      answer: "長文メモや整理用途には十分使えますが、メールの受信箱で処理したい短いメモ用途には保存先が分散しやすく、向かない場合があります。",
+    },
+    {
+      question: "自分にメールするメモは何が便利ですか？",
+      answer: "メールの受信箱をそのままToDoリストとして使えるため、あとで返信・転送・検索・アーカイブしやすくなります。複数の媒体への展開もメールから始められます。",
+    },
+    {
+      question: "会議メモや文字起こし用途にも使えますか？",
+      answer: "録音や文字起こしそのものではなく、あとで文字起こしを見るときの目印や、会議中の短い宿題メモとして向いています。録音とは別レイヤーの一時メモとして併用するのがおすすめです。",
+    },
+    {
+      question: "シンプルメモはCaptioと同じアプリですか？",
+      answer: "同じアプリではありません。Captioの公式後継でもありません。Captioに近い書いて自分にメールするという体験を、iPhone向けに別開発で再現したアプリです。",
+    },
+  ],
+};
+
 /** FAQ items for the About page — maps to content sections */
 const ABOUT_FAQ_ITEMS = [
   {
@@ -100,34 +134,53 @@ export default function StaticPage({ loaderData }: Route.ComponentProps) {
   const { page } = loaderData;
   const slug = page.slug;
   const pageUrl = `https://kakiokosi.com/share/${slug}`;
-  const pageType = PAGE_SCHEMA_TYPES[slug] || "WebPage";
+  const isArticle = ARTICLE_SLUGS.has(slug);
+  const pageType = isArticle ? "Article" : (PAGE_SCHEMA_TYPES[slug] || "WebPage");
+  const description = PAGE_DESCRIPTIONS[slug] || `${page.title} — 書き起こし.com`;
 
-  const pageSchema = {
-    "@context": "https://schema.org",
-    "@type": pageType,
-    name: page.title,
-    description: PAGE_DESCRIPTIONS[slug] || `${page.title} — 書き起こし.com`,
-    url: pageUrl,
-    inLanguage: "ja",
-    isPartOf: {
-      "@type": "WebSite",
-      name: "書き起こし.com",
-      url: "https://kakiokosi.com",
-    },
-  };
+  const pageSchema: Record<string, unknown> = isArticle
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: page.title,
+        description,
+        url: pageUrl,
+        mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
+        inLanguage: "ja",
+        author: { "@type": "Organization", name: "書き起こし.com 編集部", url: "https://kakiokosi.com" },
+        publisher: { "@id": "https://kakiokosi.com/#organization" },
+        image: "https://kakiokosi.com/images/default-og.png",
+      }
+    : {
+        "@context": "https://schema.org",
+        "@type": pageType,
+        name: page.title,
+        description,
+        url: pageUrl,
+        inLanguage: "ja",
+        isPartOf: {
+          "@type": "WebSite",
+          name: "書き起こし.com",
+          url: "https://kakiokosi.com",
+        },
+      };
 
-  const faqSchema = slug === "about" ? {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: ABOUT_FAQ_ITEMS.map((item) => ({
-      "@type": "Question",
-      name: item.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: item.answer,
-      },
-    })),
-  } : null;
+  const faqItems =
+    slug === "about" ? ABOUT_FAQ_ITEMS : FAQ_ITEMS_BY_SLUG[slug] ?? null;
+  const faqSchema = faqItems
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqItems.map((item) => ({
+          "@type": "Question",
+          name: item.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: item.answer,
+          },
+        })),
+      }
+    : null;
 
   return (
     <section className="max-w-3xl mx-auto">
