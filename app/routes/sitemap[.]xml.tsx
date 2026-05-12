@@ -4,7 +4,7 @@ export async function loader({ context }: Route.LoaderArgs) {
   const db = context.cloudflare.env.DB;
   const baseUrl = "https://kakiokosi.com";
 
-  const [posts, pages, categories, tags] = await Promise.all([
+  const [posts, pages, categories] = await Promise.all([
     db
       .prepare(
         `SELECT id, primary_category, published_at, updated_at FROM posts WHERE status = 'published' ORDER BY published_at DESC`
@@ -21,16 +21,6 @@ export async function loader({ context }: Route.LoaderArgs) {
          JOIN posts p ON p.id = pc.post_id AND p.status = 'published'
          GROUP BY c.slug
          HAVING COUNT(pc.post_id) >= 1`
-      )
-      .all<{ slug: string; lastmod: string | null }>(),
-    db
-      .prepare(
-        `SELECT t.slug, MAX(COALESCE(p.updated_at, p.published_at)) as lastmod
-         FROM tags t
-         JOIN post_tags pt ON pt.tag_slug = t.slug
-         JOIN posts p ON p.id = pt.post_id AND p.status = 'published'
-         GROUP BY t.slug
-         HAVING COUNT(pt.post_id) >= 15`
       )
       .all<{ slug: string; lastmod: string | null }>(),
   ]);
@@ -51,10 +41,8 @@ export async function loader({ context }: Route.LoaderArgs) {
     urls.push(entry(baseUrl, `/share/category/${cat.slug}`, cat.lastmod ?? null));
   }
 
-  // Tag pages (only tags with 15+ articles)
-  for (const tag of tags.results) {
-    urls.push(entry(baseUrl, `/share/tag/${tag.slug}`, tag.lastmod ?? null));
-  }
+  // Tag pages are noindex'd site-wide (see share.tag.$slug.tsx) and excluded
+  // from the sitemap to avoid sending mixed signals to crawlers.
 
   // Static pages (exclude login/regist/update/preparation/complete_regist)
   const publicPages = new Set([
