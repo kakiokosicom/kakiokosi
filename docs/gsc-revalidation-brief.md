@@ -1,35 +1,80 @@
-# GSC「クロール済み - インデックス未登録」再検証申請ブリーフ
+# GSC「クロール済み - インデックス未登録」再検証申請ブリーフ (62件版)
 
 ## 概要
 
-`kakiokosi.com` の GSC「ページのインデックス登録」レポートで、`クロール済み - インデックス未登録` が **30件** 検出された。前回の検証期間（2026-04-06 〜 2026-04-11）は失敗扱いで終わっている。
+`kakiokosi.com` の GSC「ページのインデックス登録」レポートで、`クロール済み - インデックス未登録` が **62件** 検出された。
 
-このブリーフを書いた時点（2026-05-06）で、30件全てに対して必要なコード/コンテンツ修正は **本番反映済み**。あとは GSC で再検証を申請するだけ。**30件まとめて1回の申請** で完結する。
+直近の検証履歴:
+- 1回目: 2026-04-06 〜 2026-04-11 → 失敗
+- 2回目: 2026-05-07 〜 2026-05-09 → 失敗 (前回ブリーフの30件修正後)
 
-## 修正済みの内容（背景）
+2回目の失敗を受けて、Google が同じ根本原因 (excerpt の機械切り出し) を持つ追加記事を発掘し、対象が30件 → 62件に拡大した。本ブリーフは、この62件すべてに対応するコード・データ修正を本番反映した上で、3回目の再検証申請を行うためのもの。
 
-3バケットそれぞれに対する対応はすでに完了している。再検証申請は、Googleが対応済みの状態を再クロールして「合格」に変えるためのトリガー。
+## 修正済みの内容 (本ブリーフ作成時点: 2026-05-12)
 
-### バケット①: ページネーション・タグページ（3件）
+62件は以下の5バケットに分類し、それぞれ対応済み。
 
-`<meta name="robots" content="noindex, follow">` がすでに付与されている（コミット `dfcfdf2`）。Googleがインデックスしないのは意図された挙動なので、再検証で「合格」になる。
+### バケット①: 投稿 excerpt 機械切り出し (47件)
 
-- `https://kakiokosi.com/share/category/business/page/3`
-- `https://kakiokosi.com/share/tag/文字おこし`
-- `https://kakiokosi.com/share/tag/三木谷浩史`
+うち PR #28 で既に curated excerpt に書き換え済み: **10件**
+(business/{45, 109, 111, 113, 115, 153, 220, 279}, society/{207, 263})
+
+今回新たに curated excerpt に書き換え: **37件**
+- business: 117, 130, 146, 174, 217, 222, 239, 286, 293, 305
+- politics: 224, 226, 227, 244, 248, 250, 252, 253, 255, 256, 258
+- society: 209, 215, 219, 240, 260, 262, 264
+- entertainment: 230, 231, 232, 233, 236
+- economy: 234, 237, 242, 278
+
+マイグレーション: `migrations/0023_regenerate_excerpts_for_37_more_posts.sql`
+各 excerpt は 100〜130字、書き起こし.com 編集部視点で書き下ろし。0022 と同じ品質基準。
+
+確認方法 (本番D1適用後):
+```bash
+curl -s "https://kakiokosi.com/share/business/217" | grep -oE 'name="description" content="[^"]*"' | head -1
+# → name="description" content="ハーバード講師・ポジティブ心理学者ショーン・エイカー氏のTED Talk「幸福と成功の意外な関係」全文書き起こし..."
+```
+
+### バケット②: タグページ (7件)
+
+GSC レポートに7件のタグページが含まれる:
+- /share/tag/ted, 書き起こし, 原発, スタートアップ, 孫正義, 文字おこし, 三木谷浩史
+
+PR #22 では「15件未満の薄いタグページ」のみ noindex していたが、≥15件のタグページも結局インデックスされず、定型テンプレ description (`「◯◯」に関する書き起こし記事XX件を掲載。講演...`) の問題が露呈した。
+
+今回の修正: タグページを **サイト全体で noindex** に変更。
+- `app/routes/share.tag.$slug.tsx`: `MIN_ARTICLES_FOR_INDEX` を `Number.POSITIVE_INFINITY` に
+- `app/routes/sitemap[.]xml.tsx`: タグページを sitemap から除外 (混合シグナル回避)
+
+`noindex, follow` のため内部リンク経由のクロールは維持。Googleは noindex を「意図された除外」と認識し、検証で「合格」扱いになる見込み。
 
 確認方法:
 ```bash
-curl -s "https://kakiokosi.com/share/category/business/page/3" | grep -oE '<meta[^>]*name="robots"[^>]*>'
+curl -s "https://kakiokosi.com/share/tag/ted" | grep -oE '<meta[^>]*name="robots"[^>]*>'
 # → <meta name="robots" content="noindex, follow"/>
 ```
 
-### バケット②: www サブドメイン（2件）
+### バケット③: ピラーページ薄い description (2件)
 
-`www.kakiokosi.com` への 301 リダイレクトを Worker で実装済み（コミット `bb4e030`）。Googleはリダイレクト先の正規URL（非www）を辿るので、www版の「インデックス未登録」は正しい挙動。
+- `/share/jirei` → 旧 "書き起こしの事例紹介" (10字) → 100字以上のSEO品質に拡張
+- `/share/tapeokoshi` → 旧 "テープ起こしの基本と方法について" (16字) → 100字以上に拡張
+
+ついでに同様に薄かった他5ページ (technique, nagare, omitsumori, point, webmeeting) も同じ方針で拡張。
+
+実装場所: `app/routes/share.static.tsx` の `PAGE_DESCRIPTIONS`
+
+確認方法:
+```bash
+curl -s "https://kakiokosi.com/share/jirei" | grep -oE 'name="description" content="[^"]*"' | head -1
+# → 100字以上の説明文が返る
+```
+
+### バケット④: www サブドメイン (2件)
 
 - `https://www.kakiokosi.com/share/business/293`
 - `https://www.kakiokosi.com/share/business/305`
+
+301 リダイレクト動作中 (PR #20 系)。GSC再検証で合格見込み。
 
 確認方法:
 ```bash
@@ -37,60 +82,58 @@ curl -s -o /dev/null -w "HTTP %{http_code} -> %{redirect_url}\n" "https://www.ka
 # → HTTP 301 -> https://kakiokosi.com/share/business/293
 ```
 
-### バケット③: 旧WP記事 25件
+### バケット⑤: 4ピラーページ description (既にOK、念のため記載) (4件)
 
-excerpt（`<meta name="description">` の元）が「本文冒頭150文字の機械切り出し」になっており、検索結果スニペット品質が低かった。
+`/share/ai-hatarakikata, /share/kigyoka-meigen, /share/presentation, /share/ted-talks` は既に十分な description あり。クロール再評価により合格見込み。
 
-修正内容: 各記事の `posts.excerpt` を、80〜120字の SEO向け要約（話者・イベント・主要トピック）に書き換えた（マイグレーション `0022_regenerate_excerpts_for_25_old_posts.sql`、PR #28、本番D1反映済み）。
+## デプロイ手順
 
-該当URL:
+1. PR を merge し本番に反映
+2. **本番D1 にマイグレーション 0023 を適用** (手動)
+   ```bash
+   npx wrangler d1 execute kakiokosi-db --remote --file=migrations/0023_regenerate_excerpts_for_37_more_posts.sql
+   ```
+3. 反映確認 (上記の curl コマンドで複数URLを抜き取りチェック)
+4. GSC で再検証を申請
 
-| 件数 | URL |
-|---|---|
-| 1 | `https://kakiokosi.com/share/politics/93` |
-| 7 | `https://kakiokosi.com/share/society/{105,106,207,263,275,277,300}` |
-| 17 | `https://kakiokosi.com/share/business/{37,45,74,77,81,102,109,111,113,115,119,153,220,279,280,306,309}` |
+## GSC での操作手順 (62件一括)
 
-確認方法（任意）:
-```bash
-# 例: id=119 (Mark Zuckerberg) — 旧版は英語先頭文だったが、新版は和文の要約に切り替わっている
-curl -s -L "https://kakiokosi.com/share/business/119" | grep -oE 'name="description" content="[^"]*"' | head -1
-# → name="description" content="マーク・ザッカーバーグ氏がスタンフォード大学CS183で語った「Team Dynamics」講義の全文書き起こし（英語）..."
-```
-
-## GSC での操作手順（30件一括）
-
-GSC の「修正を検証」ボタンは、レポート画面の **検出ステータス全体に対して1回押すだけ** で、含まれる全URLが対象になる。30件を個別に押す必要はない。
-
-1. Google Search Console を開き、プロパティ `https://kakiokosi.com/`（または `sc-domain:kakiokosi.com`）を選択
+1. Google Search Console を開き、プロパティ `https://kakiokosi.com/` を選択
 2. 左メニューから「**ページのインデックス登録**」を開く
 3. レポート下部の「ページがインデックスに登録されなかった理由」セクションで、「**クロール済み - インデックス未登録**」をクリック
-4. 詳細画面の上部、「検証: 失敗しました（2026-04-11）」のステータス表示の右側にある「**修正を検証**」ボタンをクリック
+4. 詳細画面の上部、「検証: 失敗しました (2026-05-09)」の右側にある「**修正を検証**」ボタンをクリック
 5. 申請後、ステータスが「**検証: 開始済み**」に変わる
 6. 数日〜2週間で Google の自動検証が走る
 
 ## 期待される結果
 
-- バケット①②（5件）: 高確率で「合格」になる。条件はすでに完全に満たされている。
-- バケット③（25件）: excerpt は改善されたが、Googleの「クロール済み - インデックス未登録」判定はサイト全体の信頼度・内部リンク量・コンテンツの独自性など複合的な要素に依存する。一部は合格、一部は引き続き保留の可能性がある。再検証を1回トリガーすることで、Googleが新しいexcerptを再評価する機会を作る効果は大きい。
+| バケット | 件数 | 合格見込み |
+|---|---|---|
+| ①: 投稿 excerpt 書き換え | 47件 | 中〜高 (PR #28経験から、curated excerptはGoogleの再評価を促す効果はあるが、保証はない) |
+| ②: タグページ noindex | 7件 | 高 (noindex は明示的シグナル) |
+| ③: ピラーページ description拡張 | 2件 | 中 (薄さは解消したが、他のシグナルも影響) |
+| ④: www → non-www 301 | 2件 | 高 (リダイレクトは確実に動作) |
+| ⑤: 既に対応済みピラー | 4件 | 中 |
 
-## 申請後にやること（任意）
+合計、最低でも 11〜15件は確実に合格する見込み。残りは Google の総合判定次第。
 
-申請から1〜2週間後にGSCで再度ステータスを確認:
-- 「合格」または「合格しました」になっていればOK
-- 部分的に失敗が残っている場合は、残りURLの個別調査が必要（追加の改善 → 再申請のサイクル）
+## 失敗が続く場合の次の一手
 
-## 注意事項
+仮に3回目の検証も部分失敗で終わった場合、残ったURLに対しては excerpt 以外の品質シグナル (内部リンク密度、E-E-A-T、本文の独自性、被リンク) を調査する必要がある。具体的には:
 
-- GSC の「修正を検証」は同じレポートに対して **同時に1回しか走らない**。検証中に再度押せない。
-- 検証が「失敗」で終わっても、コンテンツを再修正してから再申請すれば再評価される。クールダウン期間はない。
-- 検証期間中は、Googleの再クロールを待つだけなので、ユーザー側で追加で必要な作業はない。
+- 内部リンク数: 各記事に他記事から何本リンクが張られているか (4本未満は要強化)
+- 関連記事ブロック / pillar pages からの言及
+- スキーマ (Article, Person) の completeness
+- 本文の重複度 (転載前提の記事は editorial-note の充実が鍵)
+
+これらの調査は別ブリーフに切り出す。
 
 ## 関連リンク
 
 - 前提となる修正PR:
-  - PR #22: noindex paginated & thin tag pages（バケット①対応）
-  - PR #20: www→non-www 301（バケット②対応）
-  - PR #28: 25件 excerpt 再生成（バケット③対応）
+  - PR #22: noindex paginated & thin tag pages (今回サイト全体noindexに拡張)
+  - PR #20系: www→non-www 301
+  - PR #28: 旧WP記事25件 excerpt 再生成 (今回追加37件は同じ方針)
 - 関連ドキュメント:
-  - `migrations/0022_regenerate_excerpts_for_25_old_posts.sql` — excerpt差し替え内容
+  - `migrations/0022_regenerate_excerpts_for_25_old_posts.sql`
+  - `migrations/0023_regenerate_excerpts_for_37_more_posts.sql`

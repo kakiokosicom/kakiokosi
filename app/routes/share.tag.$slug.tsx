@@ -6,8 +6,16 @@ import { Pagination } from "~/components/pagination";
 import { JsonLd } from "~/components/json-ld";
 import { collectionPageSchema } from "~/lib/schema";
 
-/** Minimum number of articles for a tag page to be indexed by search engines. */
-const MIN_ARTICLES_FOR_INDEX = 15;
+/**
+ * Tag pages are noindex'd site-wide.
+ *
+ * Rationale: tag pages contain only a list of post cards with no tag-specific
+ * unique content, and the meta description is templated per tag (only the
+ * keyword changes). Google's "Crawled - not indexed" verdict (GSC 2026-05)
+ * confirmed that even larger tag pages (15+ articles) fail to be indexed.
+ * Following site-wide noindex; `follow` keeps the internal-link signal intact.
+ */
+const MIN_ARTICLES_FOR_INDEX = Number.POSITIVE_INFINITY;
 
 export async function loader({ params, context }: Route.LoaderArgs) {
   const db = context.cloudflare.env.DB;
