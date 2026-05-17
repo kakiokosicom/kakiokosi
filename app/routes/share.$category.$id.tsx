@@ -94,6 +94,11 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
   return [
     { title: `${post.title} | 書き起こし.com` },
     { name: "description", content: description },
+    // 派生・断片の逐語転載は noindex（migration 0024）。follow で keeper への
+    // 内部リンク評価は温存し、Google には「意図された除外」と認識させる。
+    ...(post.noindex === 1
+      ? [{ name: "robots", content: "noindex, follow" }]
+      : []),
     { tagName: "link", rel: "canonical", href: url },
     { property: "og:title", content: post.title },
     { property: "og:description", content: description },
