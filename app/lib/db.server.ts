@@ -10,6 +10,8 @@ export type Post = {
   voicy_url: string | null;
   spotify_url: string | null;
   source_url: string | null;
+  /** 1 = 派生・断片の逐語転載。robots noindex + sitemap 除外（migration 0024）。 */
+  noindex: number;
   published_at: string | null;
   created_at: string;
   updated_at: string;

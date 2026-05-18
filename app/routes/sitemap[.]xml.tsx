@@ -7,7 +7,8 @@ export async function loader({ context }: Route.LoaderArgs) {
   const [posts, pages, categories] = await Promise.all([
     db
       .prepare(
-        `SELECT id, primary_category, published_at, updated_at FROM posts WHERE status = 'published' ORDER BY published_at DESC`
+        // noindex 投稿（派生・断片の逐語転載, migration 0024）は混合シグナル回避のため除外
+        `SELECT id, primary_category, published_at, updated_at FROM posts WHERE status = 'published' AND noindex = 0 ORDER BY published_at DESC`
       )
       .all<{ id: number; primary_category: string; published_at: string; updated_at: string }>(),
     db
