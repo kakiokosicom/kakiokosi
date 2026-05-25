@@ -90,6 +90,7 @@ const GLOBAL_JSON_LD = {
         availableLanguage: "Japanese",
       },
       sameAs: [
+        "https://x.com/kakiokosi",
         "https://x.com/paji_a",
         "https://note.com/hajimeataka",
       ],
