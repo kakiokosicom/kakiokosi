@@ -1,7 +1,15 @@
+import {
+  PROMO_MARKER_REGEX,
+  PROMO_MARKER_TOKEN,
+  getAppPromoHtml,
+} from "~/components/app-promo";
+
 /**
  * Processes WordPress-migrated article HTML:
  *  - Wraps unstructured text in <p> tags
  *  - Injects H2 headings into long articles that lack them
+ *  - Expands `<!-- promo:simplememofast -->` markers into the inline app promo
+ *    (opt-in per article — no site-wide auto-placement)
  */
 export function formatArticleContent(html: string): string {
   // Decode escaped unicode sequences (e.g. \u003c → <) from double-encoded JSON
@@ -43,6 +51,13 @@ export function formatArticleContent(html: string): string {
   // Inject H2 headings if content is long and lacks them
   if (!/<h2[\s>]/i.test(content) && content.length > 5000) {
     content = injectHeadings(content);
+  }
+
+  // Expand the app-promo marker (opt-in, per-article). Fast-path the common
+  // case where the marker is absent so we don't allocate the promo HTML for
+  // every article render.
+  if (content.includes(PROMO_MARKER_TOKEN)) {
+    content = content.replace(PROMO_MARKER_REGEX, getAppPromoHtml());
   }
 
   return content;
