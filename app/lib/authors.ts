@@ -32,7 +32,7 @@ const DEFAULT_AUTHOR: Author = {
   bio: "2011年から講演・インタビュー・スピーチの書き起こし記事を制作・編集しています。ビジネス、政治、社会、IT、エンターテイメントなど幅広いジャンルのトークを正確に文字に起こし、知識として共有しています。",
   url: "https://kakiokosi.com/share/about",
   sameAs: [
-    "https://x.com/paji_a",
+    "https://x.com/kakiokosi",
   ],
 };
 
