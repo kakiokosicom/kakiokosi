@@ -44,6 +44,7 @@ export default [
 
   // Tag listing
   route("share/tag/:slug", "routes/share.tag.$slug.tsx"),
+  route("share/tag/:slug/page/:page", "routes/share.tag.$slug.page.$page.tsx"),
 
   // Article page (must be after static pages to avoid conflicts)
   route("share/:category/:id", "routes/share.$category.$id.tsx"),
