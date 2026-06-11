@@ -6,6 +6,7 @@ import { formatArticleContent } from "~/lib/format-content";
 import { Icon } from "~/components/icon";
 import { imageSrcSet, imageSrc } from "~/lib/image";
 import { getAuthor, authorJsonLd } from "~/lib/authors";
+import { ogImageUrl } from "~/lib/og-manifest";
 
 /** Generate a meta description from article HTML content when no excerpt exists. */
 function generateExcerpt(html: string, fallback: string): string {
@@ -105,8 +106,8 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
     { property: "og:url", content: url },
     { property: "og:site_name", content: "書き起こし.com" },
     { property: "og:locale", content: "ja_JP" },
-    { property: "og:image", content: post.thumbnail_url ? (post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}`) : "https://kakiokosi.com/images/default-og.png" },
-    { name: "twitter:image", content: post.thumbnail_url ? (post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}`) : "https://kakiokosi.com/images/default-og.png" },
+    { property: "og:image", content: post.thumbnail_url ? (post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}`) : ogImageUrl(`post-${post.id}`) },
+    { name: "twitter:image", content: post.thumbnail_url ? (post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}`) : ogImageUrl(`post-${post.id}`) },
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: post.title },
     { name: "twitter:description", content: description },
@@ -147,7 +148,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
         dateModified: (post.updated_at || post.published_at) ? (post.updated_at || post.published_at)!.replace(" ", "T") + "+09:00" : undefined,
         image: post.thumbnail_url
           ? { "@type": "ImageObject", url: post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}` }
-          : { "@type": "ImageObject", url: "https://kakiokosi.com/images/default-og.png" },
+          : { "@type": "ImageObject", url: ogImageUrl(`post-${post.id}`), width: 1200, height: 630 },
         author: authorJsonLd(getAuthor(post.author_id, !!(post.voicy_url || post.spotify_url))),
         publisher: {
           "@type": "Organization",

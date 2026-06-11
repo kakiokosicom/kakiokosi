@@ -5,6 +5,7 @@ import { PostCard } from "~/components/post-card";
 import { Pagination } from "~/components/pagination";
 import { JsonLd } from "~/components/json-ld";
 import { collectionPageSchema, breadcrumbSchema } from "~/lib/schema";
+import { ogImageUrl } from "~/lib/og-manifest";
 
 const CATEGORY_LABELS: Record<string, string> = {
   business: "ビジネス",
@@ -73,11 +74,11 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
     { property: "og:url", content: url },
     { property: "og:site_name", content: "書き起こし.com" },
     { property: "og:locale", content: "ja_JP" },
-    { property: "og:image", content: "https://kakiokosi.com/images/default-og.png" },
+    { property: "og:image", content: ogImageUrl(`category-${slug}`) },
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: `${name} | 書き起こし.com` },
     { name: "twitter:description", content: description },
-    { name: "twitter:image", content: "https://kakiokosi.com/images/default-og.png" },
+    { name: "twitter:image", content: ogImageUrl(`category-${slug}`) },
   ];
 }
 
