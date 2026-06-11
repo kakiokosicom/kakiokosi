@@ -217,9 +217,22 @@ function stripExcerpt(html) {
 async function main() {
   console.log(`▶ 原液記事化バッチ  model=${MODEL} limit=${LIMIT} min-score=${MIN_SCORE} dry-run=${DRY}`);
 
+  // voicy_url 等の出典メタデータも取得して生成記事へ引き継ぐ。
+  // 出典が一切ない原液は記事化しない（サイトの編集方針「出典の明示」を
+  // パイプラインレベルで強制する — SEO監査 2026-06-11 の Critical #1 対応）。
   const pool = d1Select(
-    `SELECT id, title, content FROM posts WHERE status='draft' AND primary_category='etc' ORDER BY id ASC LIMIT ${LIMIT}`
+    `SELECT id, title, content, voicy_url, spotify_url, source_url
+     FROM posts WHERE status='draft' AND primary_category='etc'
+       AND (voicy_url IS NOT NULL OR spotify_url IS NOT NULL OR source_url IS NOT NULL)
+     ORDER BY id ASC LIMIT ${LIMIT}`
   );
+  const skipped = d1Select(
+    `SELECT COUNT(*) c FROM posts WHERE status='draft' AND primary_category='etc'
+       AND voicy_url IS NULL AND spotify_url IS NULL AND source_url IS NULL`
+  )[0]?.c;
+  if (skipped > 0) {
+    console.log(`⚠ 出典メタデータ(voicy_url/spotify_url/source_url)が無い原液 ${skipped} 本はスキップ対象です。`);
+  }
   if (pool.length === 0) {
     console.log("プールに原液がありません（処理対象0）。");
     return;
@@ -266,9 +279,14 @@ async function main() {
         continue;
       }
 
-      // it ドラフトを作成 + 原液を退避（来歴 source_id を記録）
-      const insert = `INSERT INTO posts (author_id, title, content, excerpt, status, primary_category, source_id, created_at, updated_at)
-VALUES (NULL, '${sqlEsc(meta.title)}', '${sqlEsc(article)}', '${sqlEsc(meta.excerpt)}', 'draft', 'it', ${row.id}, datetime('now','+9 hours'), datetime('now','+9 hours'));
+      // it ドラフトを作成 + 原液を退避（来歴 source_id を記録）。
+      // 出典メタデータ（voicy/spotify/source_url）を記事に引き継ぐことで、
+      // 記事テンプレートの出典ボックス・音声プレイヤー・Article schema の
+      // isBasedOn が自動的に有効になる。author_id でサイトオーナーを著者として明示
+      // （author_id は users(id) へのFKのため実行時に解決する）。
+      const sqlVal = (v) => (v ? `'${sqlEsc(v)}'` : "NULL");
+      const insert = `INSERT INTO posts (author_id, title, content, excerpt, status, primary_category, source_id, voicy_url, spotify_url, source_url, created_at, updated_at)
+VALUES ((SELECT id FROM users WHERE email='hajimeataka@gmail.com'), '${sqlEsc(meta.title)}', '${sqlEsc(article)}', '${sqlEsc(meta.excerpt)}', 'draft', 'it', ${row.id}, ${sqlVal(row.voicy_url)}, ${sqlVal(row.spotify_url)}, ${sqlVal(row.source_url)}, datetime('now','+9 hours'), datetime('now','+9 hours'));
 UPDATE posts SET status='archived', updated_at=datetime('now','+9 hours') WHERE id=${row.id};`;
       d1RunFile(insert, `ins_${row.id}`);
       console.log(`${tag} → it draft 作成  title=「${meta.title}」`);

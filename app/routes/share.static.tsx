@@ -3,6 +3,7 @@ import type { Route } from "./+types/share.static";
 import { getPage } from "~/lib/db.server";
 import { JsonLd } from "~/components/json-ld";
 import { breadcrumbSchema } from "~/lib/schema";
+import { ogImageUrl } from "~/lib/og-manifest";
 
 /** Slugs that were promoted to regular posts. 301 to the new canonical URL. */
 const REDIRECTED_SLUGS: Record<string, string> = {
@@ -31,12 +32,12 @@ export async function loader({ request, context }: Route.LoaderArgs) {
 }
 
 const PAGE_DESCRIPTIONS: Record<string, string> = {
-  about: "書き起こし.comは、講演・インタビュー・スピーチの書き起こし記事を共有するサイトです。",
-  privacy: "書き起こし.comのプライバシーポリシー — 個人情報の取り扱いについて",
-  tos: "書き起こし.comの利用規約",
-  contact: "書き起こし.comへのお問い合わせ",
-  company: "書き起こし.comの運営情報",
-  regal: "書き起こし.comの特定商取引法に基づく表記",
+  about: "書き起こし.comは2011年から運営する講演・インタビュー・スピーチの書き起こし専門メディアです。編集方針、品質管理の体制、出典の明示や著作権への配慮など、サイトの運営姿勢を紹介します。",
+  privacy: "書き起こし.comのプライバシーポリシー。個人情報の取得目的・利用範囲・第三者提供・Cookieの扱い・お問い合わせ窓口など、当サイトにおける個人情報保護の方針を定めています。",
+  tos: "書き起こし.comの利用規約。コンテンツの著作権、引用・転載のルール、禁止事項、免責事項など、当サイトをご利用いただく際の条件を定めています。",
+  contact: "書き起こし.comへのお問い合わせページ。記事内容の誤りのご指摘、書き起こしのご依頼・お見積もり、掲載に関するご要望などは、こちらのフォームからご連絡ください。",
+  company: "書き起こし.comの運営情報。運営会社（株式会社ユリカ）の概要、所在地、事業内容、サイトの沿革など、当メディアの運営体制について掲載しています。",
+  regal: "書き起こし.comの特定商取引法に基づく表記。販売事業者名、所在地、連絡先、料金、支払い方法、納品時期、キャンセルポリシーなどを記載しています。",
   "kakiokoshi-toha": "書き起こし（文字起こし）とは？意味・やり方・活用法をプロが徹底解説。講演・インタビュー・会議の音声をテキスト化する方法と、書き起こし.comの15年の実績に基づくノウハウを紹介します。",
   "mojikoshi-tool": "AI文字起こしツール・アプリを徹底比較。精度・料金・対応言語・リアルタイム対応などの観点で主要ツールを評価し、用途別のおすすめを紹介します。",
   gijiroku: "議事録の書き方を基本から解説。会議議事録のテンプレート・フォーマット、効率的な作成方法、AI議事録ツールの活用法まで網羅します。",
@@ -72,11 +73,11 @@ export function meta({ data: loaderData, location }: Route.MetaArgs) {
     { property: "og:url", content: canonicalUrl },
     { property: "og:site_name", content: "書き起こし.com" },
     { property: "og:locale", content: "ja_JP" },
-    { property: "og:image", content: "https://kakiokosi.com/images/default-og.png" },
+    { property: "og:image", content: ogImageUrl(`page-${slug}`) },
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: `${title} | 書き起こし.com` },
     { name: "twitter:description", content: description },
-    { name: "twitter:image", content: "https://kakiokosi.com/images/default-og.png" },
+    { name: "twitter:image", content: ogImageUrl(`page-${slug}`) },
   ];
 }
 
@@ -84,26 +85,6 @@ const PAGE_SCHEMA_TYPES: Record<string, string> = {
   about: "AboutPage",
   contact: "ContactPage",
 };
-
-/** FAQ items for the About page — maps to content sections */
-const ABOUT_FAQ_ITEMS = [
-  {
-    question: "書き起こし.comとは何ですか？",
-    answer: "書き起こし.comは、講演・インタビュー・スピーチなどの映像・音声コンテンツをテキスト化し、共有するためのプラットフォームです。2011年の開設以来、政治・ビジネス・社会・IT・エンターテインメントなど、幅広い分野の書き起こし記事を掲載しています。",
-  },
-  {
-    question: "書き起こし.comでは何ができますか？",
-    answer: "政治家の演説、経営者の講演、有識者のインタビューなど、143本以上の書き起こし記事を無料で閲覧できます。ビジネス・政治・社会・海外・IT・エンタメの6カテゴリから興味のあるテーマを見つけ、記事のURLをSNSやメールで簡単にシェアできます。",
-  },
-  {
-    question: "書き起こし.comはどんな人におすすめですか？",
-    answer: "電車内や職場など音を出しにくい環境でコンテンツを消化したい方、長時間の動画を効率よく斜め読みしたい方、重要な発言を正確にテキストで確認したい研究者・ジャーナリストの方、過去のスピーチや議論を資料として活用したい方におすすめです。",
-  },
-  {
-    question: "書き起こしの品質管理はどのように行っていますか？",
-    answer: "映像・音声を丁寧に聴き取り発言内容を忠実にテキスト化し、編集部員による校正を実施しています。出典の明示、著作権への配慮、中立性の維持を方針とし、読者からの誤字・聞き取り誤りのご指摘も歓迎しています。",
-  },
-];
 
 export default function StaticPage({ loaderData }: Route.ComponentProps) {
   const { page } = loaderData;
@@ -118,32 +99,19 @@ export default function StaticPage({ loaderData }: Route.ComponentProps) {
     description: PAGE_DESCRIPTIONS[slug] || `${page.title} — 書き起こし.com`,
     url: pageUrl,
     inLanguage: "ja",
-    isPartOf: {
-      "@type": "WebSite",
-      name: "書き起こし.com",
-      url: "https://kakiokosi.com",
-    },
+    // root.tsx の GLOBAL_JSON_LD にある WebSite ノードを @id で参照する
+    // （匿名 WebSite ノードの重複を作らない）
+    isPartOf: { "@id": "https://kakiokosi.com/#website" },
   };
 
-  const faqSchema = slug === "about" ? {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: ABOUT_FAQ_ITEMS.map((item) => ({
-      "@type": "Question",
-      name: item.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: item.answer,
-      },
-    })),
-  } : null;
+  // FAQPage schema は2023年8月以降、政府・医療系サイト以外ではリッチリザルト
+  // 対象外のため出力しない（FAQ自体は本文コンテンツとして価値があるので残す）。
 
   return (
     <section className="max-w-3xl mx-auto">
       <JsonLd data={pageSchema} />
-      {faqSchema && <JsonLd data={faqSchema} />}
       <JsonLd data={breadcrumbSchema([
-        { name: "ホーム", url: "https://kakiokosi.com/share" },
+        { name: "ホーム", url: "https://kakiokosi.com/" },
         { name: page.title, url: pageUrl },
       ])} />
       <header className="mb-12">

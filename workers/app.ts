@@ -36,6 +36,18 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
+    // 末尾スラッシュURLの200応答は重複URLを生むため、正規形へ301で寄せる
+    // （ルート / と静的アセットは除外）
+    if (
+      url.pathname.length > 1 &&
+      url.pathname.endsWith("/") &&
+      !url.pathname.startsWith("/assets/") &&
+      !url.pathname.startsWith("/uploads/")
+    ) {
+      url.pathname = url.pathname.replace(/\/+$/, "");
+      return Response.redirect(url.toString(), 301);
+    }
+
     const response = await requestHandler(request, {
       cloudflare: { env, ctx },
     });

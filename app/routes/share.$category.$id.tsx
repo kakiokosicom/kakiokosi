@@ -6,6 +6,7 @@ import { formatArticleContent } from "~/lib/format-content";
 import { Icon } from "~/components/icon";
 import { imageSrcSet, imageSrc } from "~/lib/image";
 import { getAuthor, authorJsonLd } from "~/lib/authors";
+import { ogImageUrl } from "~/lib/og-manifest";
 
 /** Generate a meta description from article HTML content when no excerpt exists. */
 function generateExcerpt(html: string, fallback: string): string {
@@ -105,8 +106,8 @@ export function meta({ data: loaderData }: Route.MetaArgs) {
     { property: "og:url", content: url },
     { property: "og:site_name", content: "書き起こし.com" },
     { property: "og:locale", content: "ja_JP" },
-    { property: "og:image", content: post.thumbnail_url ? (post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}`) : "https://kakiokosi.com/images/default-og.png" },
-    { name: "twitter:image", content: post.thumbnail_url ? (post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}`) : "https://kakiokosi.com/images/default-og.png" },
+    { property: "og:image", content: post.thumbnail_url ? (post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}`) : ogImageUrl(`post-${post.id}`) },
+    { name: "twitter:image", content: post.thumbnail_url ? (post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}`) : ogImageUrl(`post-${post.id}`) },
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: post.title },
     { name: "twitter:description", content: description },
@@ -147,11 +148,20 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
         dateModified: (post.updated_at || post.published_at) ? (post.updated_at || post.published_at)!.replace(" ", "T") + "+09:00" : undefined,
         image: post.thumbnail_url
           ? { "@type": "ImageObject", url: post.thumbnail_url.startsWith("http") ? post.thumbnail_url : `https://kakiokosi.com${post.thumbnail_url}` }
-          : { "@type": "ImageObject", url: "https://kakiokosi.com/images/default-og.png" },
+          : { "@type": "ImageObject", url: ogImageUrl(`post-${post.id}`), width: 1200, height: 630 },
         author: authorJsonLd(getAuthor(post.author_id, !!(post.voicy_url || post.spotify_url))),
         publisher: {
+          "@type": "Organization",
           "@id": "https://kakiokosi.com/#organization",
+          name: "書き起こし.com",
+          logo: {
+            "@type": "ImageObject",
+            url: "https://kakiokosi.com/images/default-og.png",
+          },
         },
+        ...((post.source_url || post.voicy_url || post.spotify_url)
+          ? { isBasedOn: post.source_url || post.voicy_url || post.spotify_url }
+          : {}),
         inLanguage: "ja",
         ...(tags.length > 0
           ? { keywords: tags.map((t) => t.name).join(", ") }
@@ -187,9 +197,9 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
         {/* Breadcrumb */}
         <nav aria-label="パンくずリスト" className="mb-8 text-sm text-on-surface-variant">
           <ol className="flex items-center gap-2 list-none p-0 m-0">
-            <li><Link to="/share" className="hover:text-secondary no-underline">ホーム</Link></li>
-            <li className="before:content-['/'] before:mx-2 before:text-outline-variant">
-              <Link to={`/share/category/${post.primary_category}`} className="hover:text-secondary no-underline">{categoryLabel}</Link>
+            <li className="shrink-0 whitespace-nowrap"><Link to="/" className="inline-block py-2 hover:text-secondary no-underline">ホーム</Link></li>
+            <li className="shrink-0 whitespace-nowrap before:content-['/'] before:mx-2 before:text-outline-variant">
+              <Link to={`/share/category/${post.primary_category}`} className="inline-block py-2 hover:text-secondary no-underline">{categoryLabel}</Link>
             </li>
             <li className="before:content-['/'] before:mx-2 before:text-outline-variant text-on-surface truncate max-w-xs">
               {post.title}
@@ -255,21 +265,41 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
               {post.excerpt}
             </p>
           )}
-          {post.source_url && (
-            <div className="mb-12 text-sm text-on-surface-variant">
-              <span>元の映像・音声: </span>
-              <a
-                href={post.source_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-secondary no-underline hover:underline"
-              >
-                {post.source_url.includes("youtube") || post.source_url.includes("youtu.be")
-                  ? "YouTubeで視聴"
-                  : post.source_url.includes("ted.com")
-                    ? "TEDで視聴"
-                    : "元ソースを見る"}
-              </a>
+          {(post.source_url || post.voicy_url || post.spotify_url) && (
+            <div className="mb-12 p-4 bg-surface-container-low rounded-xl text-sm text-on-surface-variant">
+              <p className="m-0">
+                <strong className="text-primary">出典: </strong>
+                {post.voicy_url || post.spotify_url
+                  ? "本記事は安宅基（パジ）による音声配信を、書き起こし.com編集部が書き起こし・再構成したものです。"
+                  : "本記事は以下の映像・音声を書き起こし・編集したものです。"}
+                {" "}
+                {post.source_url && (
+                  <a
+                    href={post.source_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-secondary no-underline hover:underline"
+                  >
+                    {post.source_url.includes("youtube") || post.source_url.includes("youtu.be")
+                      ? "YouTubeで元の映像を視聴"
+                      : post.source_url.includes("ted.com")
+                        ? "TEDで元の映像を視聴"
+                        : "元ソースを見る"}
+                  </a>
+                )}
+                {post.source_url && (post.voicy_url || post.spotify_url) && " / "}
+                {post.voicy_url && (
+                  <a href={post.voicy_url} target="_blank" rel="noopener noreferrer" className="text-secondary no-underline hover:underline">
+                    Voicyで元の配信を聴く
+                  </a>
+                )}
+                {post.voicy_url && post.spotify_url && " / "}
+                {post.spotify_url && (
+                  <a href={post.spotify_url} target="_blank" rel="noopener noreferrer" className="text-secondary no-underline hover:underline">
+                    Spotifyで元の配信を聴く
+                  </a>
+                )}
+              </p>
             </div>
           )}
         </header>
