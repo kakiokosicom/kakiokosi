@@ -32,9 +32,12 @@ export const links: Route.LinksFunction = () => [
     href: "https://fonts.gstatic.com",
     crossOrigin: "anonymous",
   },
+  // フォントはページ重量の最大要因（監査時7ウェイトで1.0-1.6MB）。
+  // 見出しはSerif 900のみ、本文はSans 400/700の計3ウェイトに制限する。
+  // font-bold指定のSerifはCSSフォントマッチングで900にフォールバックする。
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700;900&family=Work+Sans:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&display=swap",
+    href: "https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@900&family=Noto+Sans+JP:wght@400;700&display=swap",
   },
   {
     rel: "alternate",
@@ -55,8 +58,10 @@ const GLOBAL_JSON_LD = {
   "@graph": [
     {
       "@type": "WebSite",
+      "@id": "https://kakiokosi.com/#website",
       name: "書き起こし.com",
       url: "https://kakiokosi.com",
+      publisher: { "@id": "https://kakiokosi.com/#organization" },
       description:
         "講演・インタビュー・スピーチの書き起こし記事を共有するサイト",
       inLanguage: "ja",
@@ -144,7 +149,7 @@ function Header({ user }: { user: SessionUser | null }) {
     <nav className="sticky top-0 z-50 glass-nav shadow-[0_1px_0_0_rgb(196_198_205/0.15)]">
       <div className="flex justify-between items-center px-6 md:px-8 py-4 w-full max-w-7xl mx-auto">
         <Link
-          to="/share"
+          to="/"
           className="font-serif text-2xl font-black text-primary no-underline"
         >
           書き起こし.com
@@ -352,7 +357,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         </pre>
       )}
       <Link
-        to="/share"
+        to="/"
         className="inline-block mt-8 px-6 py-3 academic-gradient text-white font-label text-sm tracking-widest uppercase no-underline"
       >
         トップに戻る

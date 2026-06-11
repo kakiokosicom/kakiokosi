@@ -1,312 +1,110 @@
-# kakiokosi.com Full SEO Audit Report
+# kakiokosi.com フルSEO監査レポート
 
-**Date:** 2026-03-28
-**URL:** https://kakiokosi.com
-**Business Type:** Japanese transcription (書き起こし) content platform
-**Pages in Sitemap:** 546 (143 articles + 9 categories + 380 tags + 14 static)
-**Tech Stack:** React Router v7 + Cloudflare Workers + D1 (SQLite) + SSR
-
----
-
-## Executive Summary
-
-### SEO Health Score: 74/100 (Grade B-)
-
-| Category | Score | Weight | Weighted | Grade |
-|----------|-------|--------|----------|-------|
-| Technical SEO | 78 | 25% | 19.5 | B |
-| Content Quality | 64 | 25% | 16.0 | C+ |
-| On-Page SEO | 82 | 20% | 16.4 | B+ |
-| Schema / Structured Data | 72 | 10% | 7.2 | B- |
-| Performance (CWV) | 65 | 10% | 6.5 | C+ |
-| Images | 55 | 5% | 2.8 | C+ |
-| AI Search Readiness | 48 | 5% | 2.4 | D+ |
-| **Total** | | | **70.8 (≈74)** | **B-** |
-
-### Top 5 Critical Issues
-1. Homepage HTML payload is 401KB (degrades TTFB/LCP)
-2. No author attribution on articles (E-E-A-T gap + Article rich results blocked)
-3. Article schema missing `publisher.logo` and `image` (rich results ineligible)
-4. Content freshness: last article published 2021 (5-year gap)
-5. 380 tag pages (70% of sitemap) — many thin content, all missing `<lastmod>`
-
-### Top 5 Quick Wins
-1. Upload `/logo.png` and add to Organization schema (30 min)
-2. Add fallback OG image for social sharing (30 min)
-3. Fix Article schema timezone (+09:00) (15 min)
-4. Add `author` field to Article JSON-LD (30 min)
-5. Raise tag sitemap threshold from 2 to 5 articles (15 min)
+**実施日:** 2026-06-11（前回: 2026-03-28）
+**クロール:** 500 URL（200=498 / 404=2）、インデックス可能ページ 93、サイトマップ 92 URL
+**手法:** 6専門サブエージェント並列分析（technical / content / schema / sitemap / performance / visual）
+**詳細:** `seo-audit-reports/` 配下に各分野のフルレポート、`screenshots/audit2-*.png` にスクリーンショット
 
 ---
 
-## 1. Technical SEO: 78/100
+## エグゼクティブサマリー
 
-### Crawlability: 85/100
+### 総合SEOヘルススコア: **79 / 100**（前回 74 → **+5**）
 
-| Check | Status |
-|-------|--------|
-| robots.txt accessible, well-formed | PASS |
-| Sitemap directive present | PASS |
-| Admin paths blocked (/auth, /dashboard, /admin) | PASS |
-| 9 AI crawlers blocked | PASS |
-| Content-Signal: search=yes, ai-train=no | PASS |
-| Sitemap valid XML, 546 URLs | PASS |
+| カテゴリ | 今回 | 前回 | 重み | 加重 |
+|---|---|---|---|---|
+| Technical SEO | 92 | 78 | 25% | 23.0 |
+| Content Quality | **62** | 64 | 25% | 15.5 |
+| On-Page SEO | 84 | 82 | 20% | 16.8 |
+| Schema / 構造化データ | 82 | 72 | 10% | 8.2 |
+| Performance (CWV) | 85 | 65 | 10% | 8.5 |
+| Images | 65 | 55 | 5% | 3.25 |
+| AI Search Readiness | 75 | 48 | 5% | 3.75 |
 
-| Issue | Severity |
-|-------|----------|
-| 380 tag pages lack `<lastmod>` in sitemap | HIGH |
-| Paginated URLs not in sitemap | MEDIUM |
-| Duplicate `User-agent: *` blocks in robots.txt | LOW |
+**ビジネスタイプ**: パブリッシャー（講演・スピーチ・インタビュー書き起こしアーカイブ、日本語）
 
-### Indexability: 82/100
+**総評**: 3月以降の施策（ホームページ401KB→56KB、noindex戦略、llms.txt、AIクローラー開放、OG画像、サイトマップ品質ゲート）が効き、技術面はほぼ完成。**唯一かつ最大のボトルネックはContent Quality (62)**。特に自動公開パイプライン産のIT記事の出典欠如は、サイト自身が掲げる編集ポリシーと矛盾しており、品質評価上のリスクです。
 
-| Check | Status |
-|-------|--------|
-| Self-referencing canonical on all pages | PASS |
-| Root `/` → `/share` 301 redirect | PASS |
-| 404 returns proper status code | PASS |
-| SSR (content in initial HTML) | PASS |
+### 前回からの解消済み項目
+401KBホームページ / logo.png 404 / OG画像なし / llms.txtなし / AIクローラーブロック / コンテンツ鮮度（2021年止まり→IT記事パイプライン稼働中） / タグ380本のサイトマップ肥大（→noindex+サイトマップ除外） / HSTS preloadなし / タイムゾーンなし日付
 
-| Issue | Severity |
-|-------|----------|
-| Homepage HTML 401KB (may cause truncation) | CRITICAL |
-| No explicit `<meta name="robots">` on public pages | LOW |
+### クリティカル課題 Top 5
+1. **IT自動生成記事 18/22本に出典・話者・元URLが一切ない** — /share/about の「出典の明示」ポリシーと矛盾。テンプレ的AI解説と判定されるリスク（2025年9月QRGの低品質AIコンテンツ指標に合致）
+2. **著者が全記事「編集部」のみ** — 運営者の実績（元livedoor・78万PV・15年アーカイブ）が可視コンテンツ・Article schemaのどちらにも不在
+3. **ピラーガイド3本（kakiokoshi-toha / gijiroku / mojikoshi-tool）の深度不足** — 「徹底解説」「完全ガイド」のタイトルに対し本文1.2〜2千字（競合の1/3〜1/5）。うち2ページでSimpleMemoFast誘導が非開示
+4. **WP移行起因の壊れた内部リンク** — /share/business/80・81・82 のgigazine URL連結バグ（404）、/share/politics/86 の消滅フォームへのリンク
+5. **httpルートのリダイレクト先が `/share`** — `http://kakiokosi.com/` → `https://kakiokosi.com/share`（正: `/`）。末尾スラッシュURLの200応答による重複も併発
 
-### Security: 95/100
-
-| Header | Value | Status |
-|--------|-------|--------|
-| HSTS | max-age=31536000; includeSubDomains | PASS |
-| X-Frame-Options | DENY | PASS |
-| X-Content-Type-Options | nosniff | PASS |
-| Referrer-Policy | strict-origin-when-cross-origin | PASS |
-| Permissions-Policy | camera=(), microphone=(), geolocation=() | PASS |
-| CSP meta | upgrade-insecure-requests | PASS |
-| HTTPS | Enforced via Cloudflare | PASS |
-
-| Issue | Severity |
-|-------|----------|
-| No full CSP HTTP header | LOW |
-| HSTS lacks `preload` directive | LOW |
-
-### URL Structure: 88/100
-
-| Pattern | Example | Status |
-|---------|---------|--------|
-| Articles | /share/{category}/{id} | Clean |
-| Categories | /share/category/{slug} | Clean |
-| Tags | /share/tag/{name} | Clean |
-| Pagination | /share/page/{n} | Clean |
-| Static | /share/about | Clean |
-
-| Issue | Severity |
-|-------|----------|
-| Article URLs use numeric IDs, not slugs | MEDIUM |
-| Content-Type header lacks charset=utf-8 | LOW |
-
-### Mobile: 90/100
-
-| Check | Status |
-|-------|--------|
-| Viewport meta tag | PASS |
-| Responsive CSS (Tailwind breakpoints) | PASS |
-| Hamburger menu with aria attributes | PASS |
-| Touch-friendly spacing | PASS |
-| Responsive typography | PASS |
-
-| Issue | Severity |
-|-------|----------|
-| Pagination touch targets 40x40px (should be 48x48) | LOW |
+### クイックウィン Top 5
+1. 壊れた内部リンク4箇所の修正（数分）
+2. http→httpsリダイレクト先を `/` に修正、`/share`→`/` 301、末尾スラッシュ301
+3. FAQPage schema削除（記事/aboutテンプレ。2023年8月以降リッチリザルト対象外）+ パンくず「ホーム」を全テンプレで `/` に統一
+4. 記事パンくず「ホーム」の縦書き崩れ修正（`app/routes/share.$category.$id.tsx:189-196` の `<li>` に `shrink-0 whitespace-nowrap`）
+5. Google Fonts 7ウェイト→4以下に削減（ページ重量の75〜80%がフォント、guideページLCP倍増の原因）
 
 ---
 
-## 2. Content Quality: 64/100
+## 1. Technical SEO — 92/100
 
-### E-E-A-T: 54/100
+- **noindex戦略の検証: 100%一貫**。タグ292・ページネーション7+カテゴリページネーション9・Block C記事93本すべてに `noindex, follow`。サイトマップ92 URLへのnoindex混入ゼロ、インデックス可能93ページと1:1整合
+- **クローラビリティ**: 完全SSR、robots.txt良好（AIクローラー条項付き）、ハード404適切、旧 `/2010/` WP URLは新URLへ301
+- **セキュリティヘッダ**: HSTS preload / CSP / nosniff / X-Frame-Options DENY — 優秀
+- **Issues**: 壊れ内部リンク4箇所（High）、httpルートの301先が `/share`（Medium）、記事URL末尾スラッシュ200（Medium、self-canonicalで緩和）
 
-| Factor | Score | Key Gap |
-|--------|-------|---------|
-| Experience | 12/25 | Transcription = third-party content |
-| Expertise | 13/25 | No editorial credentials displayed |
-| Authoritativeness | 11/25 | No external citations or industry recognition |
-| Trustworthiness | 18/25 | Updated legal pages, company info, HTTPS |
+## 2. Content Quality — 62/100 ⚠️ 最優先領域
 
-### Content Depth
+E-E-A-T内訳: Experience 70 / Expertise 55 / Authoritativeness 55 / Trust 60、AI引用準備度 72
 
-| Page Type | Word Count | Assessment |
-|-----------|-----------|------------|
-| Articles | 5,000-30,000 | EXCELLENT |
-| About | ~850 | GOOD |
-| ToS | ~2,500 (13 articles) | GOOD |
-| Privacy | ~1,500 (9 articles) | GOOD |
-| Contact | ~500 (5 FAQ sections) | GOOD |
-| Category pages | ~50 (1 sentence intro) | THIN |
+- **ITバッチ記事の出典欠如（High)**: 18/22本が話者名・元動画/記事URLなし。「文字起こし: 編集部」バイラインのみ
+- **著者シグナル不在（High)**: paji/安宅基の実績がOrganization sameAsにしか存在しない
+- **ピラーガイド深度不足（High)**: 構造は正しいが本文量がタイトルの約束に未達。SimpleMemoFast誘導2件が非開示（ステマ規制リスク）
+- **レガシー書き起こし記事は良好**: 導入文・2026年編集注・引用H2・出典リンクにより「無付加価値の複製」リスクは概ね回避
+- インデックス可能な薄いページ: 実質5本（jirei / technique / category/culture / category/economy / entertainment/641）。重複タイトルはnoindexページのみ
 
-### Content Freshness
+## 3. On-Page SEO — 84/100
 
-| Metric | Value | Rating |
-|--------|-------|--------|
-| Newest article | May 2021 | CRITICAL (5-year gap) |
-| Legal pages | Updated Dec 2024 | CURRENT |
-| About/Contact | Updated Mar 2026 | CURRENT |
+- タイトル: 93ページ中、短すぎ(<20字)3・長すぎ(>62字)3のみ。H1全ページ存在
+- メタディスクリプション50字未満が14ページ（カテゴリ・ガイド系中心）
+- 複数H1が7ページ（business/881、tapeokoshi、jirei、nagare、omitsumori 等）
+- 内部リンク5本未満のページゼロ（noindex,followでリンクエクイティ循環は維持）
 
-### Issues
+## 4. Schema / 構造化データ — 82/100
 
-| Issue | Severity |
-|-------|----------|
-| No author attribution on articles | CRITICAL |
-| Content freshness (5-year gap) | CRITICAL |
-| Category descriptions only 1 sentence | MEDIUM |
-| Article meta descriptions repeat titles | MEDIUM |
-| Only 3 internal links per 8k+ word article | MEDIUM |
-| No H2 subheadings in article content | MEDIUM |
+ブロッキングエラー0・パース不能JSON-LD 0。警告8クラス:
+FAQPage 5ページ（対象外→削除推奨）/ 全記事共通default-og.png / パンくずHomeが guide系24ページで `/share`・記事で `/` と不統一 / カテゴリ8ページBreadcrumbListなし / OGバナーのOrganizationロゴ流用 / クロススクリプト@id参照 / 匿名WebSiteノード重複 / 新パイプライン記事でkeywords・articleSection欠落
 
----
+**最高価値の推奨**: 書き起こしサイト固有のエンティティ強化 — Article に `isBasedOn`（元動画/記事URL）+ `about`/`mentions` で話者Person（Wikidata sameAs）
 
-## 3. On-Page SEO: 82/100
+## 5. Performance — 85/100（Playwrightラボ計測、CrUXなし）
 
-### Implemented
+| 指標 | 計測値 | 閾値 | 判定 |
+|---|---|---|---|
+| LCP | 552ms(home) / 660ms(記事) / 1,140ms(guide) | <2.5s | ✅ |
+| CLS | 0.000 全ページ | <0.1 | ✅ |
+| TTFB | p50 168ms / p75 248ms / p90 363ms (n=498) | <800ms | ✅ |
+| INP代理 | ハイドレーションロングタスク計395〜702ms（最大単発200ms） | <200ms | ⚠️中リスク |
 
-| Element | Coverage |
-|---------|----------|
-| Unique title tags | All pages |
-| Meta descriptions | All pages |
-| Self-referencing canonical | All pages |
-| OG tags (title, desc, url, site_name, type, locale) | All pages |
-| Twitter Cards (card, title, desc) | All pages |
-| article:published_time | Article pages |
-| H1 headings | All pages |
-| Breadcrumb navigation | Article pages |
-| Internal linking via navigation | All pages |
+- **フォントがページ重量の75〜80%**（1.0〜1.6MB、woff2スライス48〜73ファイル、7ウェイト）+ render-blocking CSS 119KB。guideページのLCP倍増（フォントスワップでLCP再発火）の直接原因
+- ハイドレーションJS 112KB(gzip)/340KB(parsed) — 静的中心サイトのためRR7ルート別ハイドレーション削減が有効
 
-### Issues
+## 6. Images — 65/100
 
-| Issue | Severity |
-|-------|----------|
-| Legacy images lack alt text | MEDIUM |
-| No og:image on any page (no social preview image) | HIGH |
-| Tag page H1 is just the tag name | LOW |
+- コンテンツ画像がサイト全体でほぼゼロ → alt問題は実質なしだが、視覚的リッチさとDiscover適性を欠く
+- OG画像が全記事共通のdefault-og.png（per-article画像なし、16:9/4:3/1:1の複数比率もなし）
+- デスクトップ1920pxのホームが平坦なネイビーブロック羅列+タイトル二重表示
+
+## 7. AI Search Readiness — 75/100（前回48から大幅改善）
+
+- ✅ GPTBot / ClaudeBot / PerplexityBot / CCBot等をrobots.txtで明示Allow、llms.txt設置済み
+- ✅ 書き起こしフォーマット自体がAI引用と高相性（引用可能なH2パッセージ構造）
+- 改善余地: 話者・出典のエンティティ明示（schema `about`/`mentions`）、ガイドページの定義文/Q&A構造、IT記事の出典（引用元として信頼されない）
+
+## 8. Visual / Mobile — 82/100（参考）
+
+- **High**: 記事ページのパンくず「ホーム」が1文字/行の縦並び（14px幅に圧縮）— 全記事で発生。flexの `<li>` にshrink抑止がないため
+- Medium: 44px未満タップターゲット（パンくずカテゴリ13×20px、著者リンク14px、ハンバーガー40×40、ロゴ32px）
+- 強み: 横スクロールゼロ、視覚的CLSなし（+3秒スクショがバイト一致）、モバイル全ページでH1がファーストビュー内、本文16〜18px
 
 ---
 
-## 4. Schema / Structured Data: 72/100
-
-### Current Implementation
-
-| Schema Type | Scope | Status |
-|-------------|-------|--------|
-| WebSite | Global (@graph in root) | LIVE |
-| Organization | Global (@graph in root) | LIVE |
-| Article | Article pages | LIVE |
-| BreadcrumbList | Article pages | LIVE |
-
-### Article Schema Fields Verified
-headline, description, url, datePublished, dateModified, author (Organization), publisher, inLanguage, keywords, articleSection, mainEntityOfPage
-
-### Validation Issues
-
-| Issue | Severity | Detail |
-|-------|----------|--------|
-| No `publisher.logo` | HIGH | Required for Google Article rich results |
-| No `image` on Article schema | HIGH | Strongly recommended for rich results |
-| Organization logo references non-existent /logo.png | HIGH | Returns 404 |
-| Dates lack timezone (+09:00) | MEDIUM | Should be ISO 8601 with JST offset |
-| No `@id` cross-references between entities | MEDIUM | Best practice for entity disambiguation |
-| Two separate `@graph` blocks on article pages | MEDIUM | Should merge global + page-specific |
-| No CollectionPage on category pages | LOW |
-| No BreadcrumbList on category/about pages | LOW |
-| No SearchAction on WebSite | LOW | Requires search feature |
-| Unused `schema.ts` helpers and `JsonLd` component | INFO | Well-written but not imported by routes |
-
----
-
-## 5. Performance (CWV): 65/100
-
-### LCP: MEDIUM RISK
-
-| Factor | Status |
-|--------|--------|
-| SSR enabled | PASS |
-| Font preconnect hints | PASS |
-| Module preloading | PASS |
-| `display=swap` on fonts | PASS |
-| Homepage HTML 401KB | CRITICAL |
-| 4 Google Fonts families loaded | MEDIUM |
-
-### INP: LOW RISK
-Minimal interactive elements, modular JS chunks.
-
-### CLS: LOW-MEDIUM RISK
-Font swap may cause shift with Japanese fonts. Image dimensions present.
-
-### Issues
-
-| Issue | Severity |
-|-------|----------|
-| Homepage HTML payload 401KB | CRITICAL |
-| 4 Google Fonts families (~Material Symbols 200KB) | MEDIUM |
-| Japanese fonts are large (1-4MB per weight) | MEDIUM |
-
----
-
-## 6. Images: 55/100
-
-### Implemented
-- `alt={post.title}` on thumbnails
-- width/height attributes prevent CLS
-- Featured image eager loading + fetchPriority
-
-### Issues
-
-| Issue | Severity |
-|-------|----------|
-| No og:image / default social sharing image | HIGH |
-| Legacy WP images in content lack alt/dimensions | MEDIUM |
-| No responsive images (srcset/sizes) | MEDIUM |
-| No modern formats (WebP/AVIF) | LOW |
-
----
-
-## 7. AI Search Readiness: 48/100
-
-### Strengths
-- Rich structured data (Article, Organization, BreadcrumbList)
-- Canonical URLs + date metadata
-- Long-form content (8k-30k words)
-
-### Weaknesses
-
-| Issue | Severity |
-|-------|----------|
-| No author info for AI citation | MEDIUM |
-| AI crawlers blocked (intentional) | INFO |
-| No quotable key takeaway sections | MEDIUM |
-| No llms.txt | LOW |
-| Content freshness gap | HIGH |
-
----
-
-## Sitemap Deep Analysis
-
-### Composition
-
-| Type | Count | % | lastmod |
-|------|-------|---|---------|
-| Articles | 143 | 26% | Present |
-| Categories | 9 | 2% | NULL (bug) |
-| Tags | 380 | 70% | Missing |
-| Static pages | 14 | 3% | Present |
-
-### Key Findings
-- Tag pages dominate sitemap (70%) — many have only 2 articles
-- Category lastmod returns NULL (post_categories join issue)
-- Tag query doesn't compute lastmod at all
-- No pagination URLs included
-- No auth/dashboard/admin URLs (correct)
-- All URLs use HTTPS, no trailing slashes (correct)
-- Quality Score: 72/100
-
----
-
-*Full audit generated 2026-03-28*
-*4 specialist subagents: Technical SEO (78), Content Quality (64), Schema (72), Sitemap (72)*
+*2026-06-11 生成 / 6専門サブエージェント並列監査（Technical 92 / Content 62 / Schema 82 / Sitemap 95 / Performance 85 / Visual 82）*

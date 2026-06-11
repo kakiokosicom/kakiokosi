@@ -4,7 +4,7 @@ import { getPostsByCategory, POSTS_PER_PAGE } from "~/lib/db.server";
 import { PostCard } from "~/components/post-card";
 import { Pagination } from "~/components/pagination";
 import { JsonLd } from "~/components/json-ld";
-import { collectionPageSchema } from "~/lib/schema";
+import { collectionPageSchema, breadcrumbSchema } from "~/lib/schema";
 
 const CATEGORY_LABELS: Record<string, string> = {
   business: "ビジネス",
@@ -13,6 +13,8 @@ const CATEGORY_LABELS: Record<string, string> = {
   world: "海外",
   it: "IT",
   entertainment: "エンターテイメント",
+  economy: "経済・マネー",
+  culture: "カルチャー",
 };
 
 const CATEGORY_LABELS_EN: Record<string, string> = {
@@ -22,6 +24,8 @@ const CATEGORY_LABELS_EN: Record<string, string> = {
   world: "Foreign",
   it: "IT",
   entertainment: "Entertainment",
+  economy: "Economy",
+  culture: "Culture",
 };
 
 const CATEGORY_DESCRIPTIONS: Record<string, string> = {
@@ -31,6 +35,8 @@ const CATEGORY_DESCRIPTIONS: Record<string, string> = {
   world: "海外の著名人によるスピーチ、国際会議での発言、海外メディアのインタビューなどの書き起こし記事をまとめています。スティーブ・ジョブズのスタンフォード大学卒業式スピーチなど、歴史的な演説も収録しています。",
   it: "Apple、Google、ソフトバンクなどテクノロジー企業の製品発表、IT業界のカンファレンス講演、技術者のプレゼンテーションなどの書き起こし記事をまとめています。テクノロジーの未来を語る先駆者たちの言葉を記録しています。",
   entertainment: "芸能人の記者会見、アーティストのインタビュー、映画・音楽・スポーツなどエンターテイメント業界に関する書き起こし記事をまとめています。メディアで話題になったあの発言を、全文テキストで確認できます。",
+  economy: "経済政策、金融、投資、マネーに関する講演・記者会見・対談の書き起こし記事をまとめています。経済の転換点となった発言や、専門家による市場分析のトークを全文テキストで確認できます。",
+  culture: "文学、アート、デザイン、ライフスタイルなどカルチャー分野の講演・インタビューの書き起こし記事をまとめています。村上春樹のスピーチなど、文化を語る言葉をテキストで読めるアーカイブです。",
 };
 
 export async function loader({ params, context }: Route.LoaderArgs) {
@@ -51,7 +57,11 @@ export async function loader({ params, context }: Route.LoaderArgs) {
 export function meta({ data: loaderData }: Route.MetaArgs) {
   const name = loaderData?.category?.name ?? "";
   const slug = loaderData?.category?.slug ?? "";
-  const description = `${name}カテゴリの書き起こし記事一覧 — 講演・インタビュー・スピーチのテキスト`;
+  // 検索結果でのクリック誘因のため、カテゴリ固有の紹介文を最大160字程度に整えて使う
+  const rich = CATEGORY_DESCRIPTIONS[slug];
+  const description = rich
+    ? (rich.length > 158 ? rich.slice(0, rich.lastIndexOf("。", 158) + 1) || rich.slice(0, 155) : rich)
+    : `${name}カテゴリの書き起こし記事一覧 — 講演・インタビュー・スピーチのテキスト`;
   const url = `https://kakiokosi.com/share/category/${slug}`;
   return [
     { title: `${name}の書き起こし記事一覧 | 書き起こし.com` },
@@ -86,6 +96,10 @@ export default function CategoryPage({ loaderData }: Route.ComponentProps) {
         url: `https://kakiokosi.com/share/category/${category.slug}`,
         numberOfItems: loaderData.total,
       })} />
+      <JsonLd data={breadcrumbSchema([
+        { name: "ホーム", url: "https://kakiokosi.com/" },
+        { name: label, url: `https://kakiokosi.com/share/category/${category.slug}` },
+      ])} />
       <header className="mb-16">
         <div className="inline-block bg-secondary-container px-3 py-1 text-[10px] font-bold tracking-[0.2em] text-on-secondary-container mb-4 uppercase">
           カテゴリ

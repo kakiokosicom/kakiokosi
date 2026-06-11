@@ -1,157 +1,117 @@
-# kakiokosi.com SEO Action Plan
+# kakiokosi.com SEOアクションプラン
 
-**Updated:** 2026-03-28
-**Current Score:** 74/100 (Grade B-)
-**Target Score:** 85/100+ (Grade A-)
+**更新:** 2026-06-11
+**現在スコア:** 79/100（前回 74）
+**目標スコア:** 88/100+
 
----
-
-## CRITICAL (fix immediately — blocks rich results or degrades performance)
-
-### 1. Reduce Homepage HTML Payload (401KB → <100KB)
-**Impact:** TTFB, LCP, crawl efficiency
-**Effort:** 1 hour
-**Files:** `app/routes/share._index.tsx`, `app/lib/db.server.ts`
-
-Homepage SSR generates 401KB of HTML. Verify the loader returns only 20 articles (page 1). Check if article content is being included in listing queries.
-
-### 2. Upload Logo Image
-**Impact:** Organization schema validation, Article rich results
-**Effort:** 30 minutes
-**Files:** `public/logo.png`, `app/lib/schema.ts`
-
-Organization schema references `/logo.png` which returns 404. Upload a logo (minimum 112x112px, recommended 600x60px for banner).
-
-### 3. Add `publisher.logo` and Fallback `image` to Article Schema
-**Impact:** Google Article rich results eligibility (REQUIRED fields)
-**Effort:** 30 minutes
-**Files:** `app/routes/share.$category.$id.tsx`
-
-- Add `logo` ImageObject to publisher
-- Add fallback image when `thumbnail_url` is null (e.g., `/images/default-og.png`)
-
-### 4. Add Author Attribution to Articles
-**Impact:** E-E-A-T, Article schema `author` field
-**Effort:** 1 hour
-**Files:** `app/routes/share.$category.$id.tsx`, Article JSON-LD
-
-- Display "書き起こし.com編集部" on article pages
-- Add `author` to Article JSON-LD with link to about page
+前回プラン(2026-03-28)の Critical 1〜4・High 5〜9 は概ね解消済み。今回はコンテンツ品質が主戦場。
 
 ---
 
-## HIGH Priority (fix within 1 week)
+## CRITICAL（即時対応 — 品質評価・ポリシー矛盾の解消）
 
-### 5. Add Default OG Image for Social Sharing
-**Impact:** Social preview on Twitter/X, Facebook, LINE
-**Effort:** 1 hour
-**Files:** `public/images/default-og.png`, all route meta functions
+### 1. IT自動生成記事に出典を必須化
+**影響:** E-E-A-T・低品質AIコンテンツ判定リスク・自社ポリシー矛盾の解消
+**工数:** パイプライン修正2h + 既存18本の遡及修正3h
+**対象:** `scripts/generate-it-drafts.mjs`（生成プロンプト）+ 既存記事18本
 
-Create a 1200x630px default OG image. Add `og:image` meta to pages without thumbnails.
+- 生成時に元動画/記事URL・話者名・所属を必須フィールド化し、記事末尾に「出典」セクションを自動挿入
+- raw-materialプールに出典メタデータがない素材は生成対象から除外
+- 既存18本に出典を遡及追加（特定できないものはnoindexまたは非公開化を検討）
 
-### 6. Fix Article Schema Timezones
-**Impact:** ISO 8601 compliance
-**Effort:** 15 minutes
-**Files:** `app/routes/share.$category.$id.tsx`
+### 2. 壊れた内部リンク4箇所の修正
+**影響:** クロール効率・UX
+**工数:** 15分
+**対象:** /share/business/80, 81, 82（gigazine URL連結バグ）、/share/politics/86（消滅フォームへのリンク）
 
-Change `.replace(" ", "T")` to `.replace(" ", "T") + "+09:00"` for datePublished/dateModified.
+DB内のhrefを修正（`"/share/business/ https:/gigazine.net/..."` → 正しい外部URL）。
 
-### 7. Optimize Tag Pages in Sitemap
-**Impact:** Crawl budget, thin content reduction
-**Effort:** 30 minutes
-**Files:** `app/routes/sitemap[.]xml.tsx`
+### 3. 著者エンティティの確立
+**影響:** E-E-A-T（最も費用対効果の高い改善）
+**工数:** 2h
+**対象:** `app/routes/share.$category.$id.tsx`、aboutページ
 
-- Raise `HAVING COUNT(pt.post_id) >= 2` to `>= 5` (reduces ~380 → ~50 tag pages)
-- Add `<lastmod>` to tag URLs via `MAX(COALESCE(p.updated_at, p.published_at))`
-
-### 8. Fix Category `<lastmod>` in Sitemap
-**Impact:** Crawl scheduling accuracy
-**Effort:** 30 minutes
-**Files:** `app/routes/sitemap[.]xml.tsx`
-
-Category lastmod returns NULL — debug the `post_categories` join table query.
-
-### 9. Publish New Content
-**Impact:** Content freshness — the biggest content quality gap
-**Effort:** Ongoing
-
-Last article is from 2021. Even 1-2 new transcripts/month would reset freshness signals.
+- 記事フッターに監修者として運営者プロフィール（元livedoor・78万PV実績・15年アーカイブ）を表示
+- Article JSON-LDの `author` を Person（aboutページへの `url` + `sameAs`）に変更
 
 ---
 
-## MEDIUM Priority (fix within 1 month)
+## HIGH（1週間以内）
 
-### 10. Add BreadcrumbList to Category and Static Pages
-**Impact:** Breadcrumb rich results on more page types
-**Effort:** 1 hour
-**Files:** Category and static route files, use existing `breadcrumbSchema()` from `app/lib/schema.ts`
+### 4. リダイレクト正規化
+**工数:** 30分
+- `http://kakiokosi.com/` の301先を `/share` → `/` に修正
+- `/share` → `/` を301（canonical一本化）
+- 記事URL末尾スラッシュを301
 
-### 11. Add CollectionPage Schema to Category Pages
-**Impact:** Enhanced indexing signals
-**Effort:** 30 minutes
-**Files:** `app/routes/share.category.$slug.tsx`, use existing `collectionPageSchema()` from `app/lib/schema.ts`
+### 5. ピラーガイド3本の増強
+**工数:** 1本あたり3〜4h
+**対象:** /share/kakiokoshi-toha、/share/gijiroku、/share/mojikoshi-tool
+- 本文を競合SERP水準（6千字〜）へ。一次経験（実際のツール検証・自社アーカイブからの実例引用）を追加
+- SimpleMemoFast誘導に「運営会社のプロダクトです」の開示文言を追加（ステマ規制対応）
 
-### 12. Expand Category Descriptions
-**Impact:** Thin content elimination
-**Effort:** 2 hours
-**Files:** DB pages or inline in category route
+### 6. パンくず修正（schema + 表示）
+**工数:** 1h
+- 「ホーム」のリンク先を全テンプレで `https://kakiokosi.com/` に統一（guide系24ページが `/share` を向いている）
+- 縦書き崩れ: `share.$category.$id.tsx:189-196` の最初の2つの `<li>` に `shrink-0 whitespace-nowrap`
+- カテゴリ8ページに BreadcrumbList 追加
 
-Add 100-200 words intro text per category.
+### 7. FAQPage schema削除
+**工数:** 30分
+記事/aboutテンプレートから削除（2023年8月以降、政府・医療系以外はリッチリザルト対象外。誤用シグナルになるだけ）。
 
-### 13. Improve Article Meta Descriptions
-**Impact:** CTR from search results
-**Effort:** 3 hours
-**Files:** `app/routes/share.$category.$id.tsx`
-
-Generate excerpt-based descriptions (120-160 chars) instead of repeating titles.
-
-### 14. Self-Host Critical Fonts / Replace Material Symbols
-**Impact:** LCP, fewer render-blocking requests
-**Effort:** 3 hours
-
-Replace Material Symbols Outlined (~200KB) with inline SVG icons (only ~5 icons used). Consider self-hosting Noto fonts with unicode-range subsetting.
-
-### 15. Increase Internal Links in Articles
-**Impact:** Link equity distribution, engagement
-**Effort:** 3-4 hours
-
-Articles average 3 internal links for 8k+ words. Add related articles component showing 3-4 related transcripts by category/tag.
-
-### 16. Merge Duplicate JSON-LD @graph Blocks
-**Impact:** Cleaner schema, avoid ambiguity
-**Effort:** 1 hour
-**Files:** `root.tsx` + `share.$category.$id.tsx`
-
-Use `@id` references instead of duplicating Organization data.
+### 8. フォント削減
+**影響:** ページ重量75〜80%削減余地、guideページのLCP半減
+**工数:** 3h
+- 7ウェイト→3〜4ウェイトに削減、セルフホスト+unicode-rangeサブセット化
+- fonts.googleapis.com CSS（119KB render-blocking）をビルド時インライン化 or 非同期化
 
 ---
 
-## LOW Priority (backlog)
+## MEDIUM（1ヶ月以内）
 
-| # | Task | Effort |
-|---|------|--------|
-| 17 | Consolidate robots.txt `User-agent: *` blocks | 15 min |
-| 18 | Add `charset=utf-8` to Content-Type header | 15 min |
-| 19 | Increase pagination touch targets to 48x48px | 15 min |
-| 20 | Add HSTS `preload` directive | 15 min |
-| 21 | Add llms.txt | 30 min |
-| 22 | Add SearchAction to WebSite schema (requires search feature) | 1 hour |
-| 23 | Implement responsive images (srcset/sizes) | 3 hours |
-| 24 | Fix legacy image alt text in WP content | 2 hours |
-| 25 | Add full Content-Security-Policy header | 1 hour |
-| 26 | Wire up existing `JsonLd` component + `schema.ts` helpers | 1 hour |
+### 9. Article schemaのエンティティ強化（書き起こしサイト固有の最高価値施策）
+`isBasedOn`（元動画URL）、`about`/`mentions` に話者Person（Wikidata sameAs付き）。AI引用・エンティティSEOの両方に効く。
 
----
+### 10. per-article OG画像
+default-og.png共通運用をやめ、タイトル入り自動生成OG画像（16:9 / 4:3 / 1:1）。Organizationに正方形ロゴ追加。
 
-## Score Projection
+### 11. @graph統合
+ページごとに単一@graph・安定@id（匿名WebSiteノード重複とクロススクリプト参照を解消）。新パイプライン記事のkeywords/articleSection復活。
 
-| Action Group | Items | Expected Impact |
-|-------------|-------|----------------|
-| Critical (1-4) | Fix now | +6-8 points → 80-82 |
-| High (5-9) | This week | +4-6 points → 84-88 |
-| Medium (10-16) | This month | +4-5 points → 88-93 |
-| Low (17-26) | Backlog | +2-3 points → 90-96 |
+### 12. 薄いインデックス可能ページ5本の増強または整理
+jirei / technique / category/culture / category/economy / entertainment/641 — 増強するか、価値が出せないならnoindexへ。
+
+### 13. メタディスクリプション50字未満14ページの書き直し
+カテゴリ・ガイド系中心。120〜160字でクリック誘因を入れる。
+
+### 14. ハイドレーションJS削減
+RR7のルート別ハイドレーション最適化（静的記事ページ）。INPロングタスク計700ms→大幅減を狙う。
+
+### 15. タップターゲット44px化 + 複数H1の7ページ修正
 
 ---
 
-*Action plan generated 2026-03-28 from 4 specialist audits*
+## LOW（バックログ）
+
+| # | タスク | 工数 |
+|---|---|---|
+| 16 | サイトマップlastmod: 移行バッチ一括値(2026-03-28×42件)を実際の更新日に | 30分 |
+| 17 | デスクトップホームの視覚改善（タイトル二重表示解消、画像/アイキャッチ導入） | 2h |
+| 18 | root.css(9KB)のインライン化 | 30分 |
+| 19 | ガイドページに定義文・Q&Aパッセージ（AI引用最適化） | 2h |
+| 20 | 404になっている旧ボランティアフォームURLの参照元清掃 | 15分 |
+
+---
+
+## スコア予測
+
+| アクション群 | 期待効果 |
+|---|---|
+| Critical 1〜3 | Content 62→72前後、総合 +3〜4点 → 82〜83 |
+| High 4〜8 | Technical/Schema/Perf 微増 + Content続伸 → 85〜86 |
+| Medium 9〜15 | エンティティ・画像・INP改善 → 88〜90 |
+
+---
+
+*2026-06-11 / 6専門サブエージェント監査結果より生成。前回プランは git 履歴参照。*

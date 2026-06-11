@@ -1,9 +1,9 @@
 @import "tailwindcss" source(".");
 
 @theme {
-  --font-sans: "Noto Sans JP", "Work Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Noto Sans JP", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Noto Serif JP", serif;
-  --font-label: "Work Sans", "Noto Sans JP", sans-serif;
+  --font-label: "Noto Sans JP", sans-serif;
 
   --color-primary: #03192e;
   --color-primary-container: #1a2e44;
