@@ -52,8 +52,13 @@ export default {
       cloudflare: { env, ctx },
     });
 
-    // Immutable cache for hashed static assets and uploaded images
-    if (url.pathname.startsWith("/assets/") || url.pathname.startsWith("/uploads/")) {
+    // Immutable cache for hashed static assets, uploaded images, and self-hosted
+    // fonts（/fonts/*.woff2 は content-hash 付きファイル名なので immutable で安全）
+    if (
+      url.pathname.startsWith("/assets/") ||
+      url.pathname.startsWith("/uploads/") ||
+      url.pathname.startsWith("/fonts/")
+    ) {
       response.headers.set(
         "Cache-Control",
         "public, max-age=31536000, immutable"
@@ -80,7 +85,8 @@ export default {
     );
     response.headers.set(
       "Content-Security-Policy",
-      "default-src 'self'; script-src 'self' 'unsafe-inline' https://analytics.ahrefs.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data:; connect-src 'self' https://analytics.ahrefs.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+      // フォントをセルフホスト化したため font-src/style-src の Google ホストを撤廃（self のみ）
+      "default-src 'self'; script-src 'self' 'unsafe-inline' https://analytics.ahrefs.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https: data:; connect-src 'self' https://analytics.ahrefs.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
     );
 
     return response;

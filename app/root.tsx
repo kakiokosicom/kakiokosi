@@ -14,6 +14,7 @@ import {
 
 import type { Route } from "./+types/root";
 import { getCurrentUser, type SessionUser } from "./lib/auth.server";
+import { FONT_FACE_CSS, PRELOAD_FONT } from "./lib/font-manifest";
 import "./app.css";
 
 const CATEGORIES = [
@@ -26,19 +27,12 @@ const CATEGORIES = [
 ];
 
 export const links: Route.LinksFunction = () => [
-  { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  {
-    rel: "preconnect",
-    href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
-  },
-  // フォントはページ重量の最大要因（監査時7ウェイトで1.0-1.6MB）。
-  // 見出しはSerif 900のみ、本文はSans 400/700の計3ウェイトに制限する。
-  // font-bold指定のSerifはCSSフォントマッチングで900にフォールバックする。
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@900&family=Noto+Sans+JP:wght@400;700&display=swap",
-  },
+  // フォントはセルフホスト（scripts/generate-fonts.py が public/fonts/ に生成）。
+  // Google Fonts css2 の 344KB render-blocking CSS と 3rd-party 接続を撤廃し、
+  // 全コンテンツ+常用漢字にサブセットした計1.7MBを immutable キャッシュで
+  // サイト全体共有する。@font-face は Layout の <head> にインライン、本文の
+  // Sans 400 は above-the-fold なので preload（content-hash付きURLは manifest 由来）。
+  { rel: "preload", as: "font", type: "font/woff2", href: PRELOAD_FONT, crossOrigin: "anonymous" },
   {
     rel: "alternate",
     type: "application/rss+xml",
@@ -110,6 +104,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta httpEquiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+        <style dangerouslySetInnerHTML={{ __html: FONT_FACE_CSS }} />
         <Meta />
         <Links />
         <script
