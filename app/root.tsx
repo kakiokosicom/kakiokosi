@@ -168,7 +168,7 @@ function Header({ user }: { user: SessionUser | null }) {
           {/* Mobile hamburger */}
           <button
             type="button"
-            className="md:hidden p-2 text-primary"
+            className="md:hidden p-2.5 text-primary"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="メニュー"
             aria-expanded={mobileMenuOpen}
