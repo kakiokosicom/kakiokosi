@@ -160,7 +160,12 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
           },
         },
         ...((post.source_url || post.voicy_url || post.spotify_url)
-          ? { isBasedOn: post.source_url || post.voicy_url || post.spotify_url }
+          ? {
+              isBasedOn: {
+                "@type": "CreativeWork",
+                url: post.source_url || post.voicy_url || post.spotify_url,
+              },
+            }
           : {}),
         inLanguage: "ja",
         ...(tags.length > 0

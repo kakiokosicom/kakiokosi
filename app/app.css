@@ -234,6 +234,37 @@ body {
   font-weight: 600;
 }
 
+/* Static/pillar page tables — match article table styling */
+.static-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+  font-size: 1rem;
+}
+
+.static-content th,
+.static-content td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-surface-container-high);
+}
+
+.static-content th {
+  background-color: var(--color-surface-container-low);
+  font-weight: 600;
+}
+
+/* Wide tables scroll horizontally on small screens instead of overflowing
+   the viewport (SEO監査 2026-06-16 Visual: guide比較表のモバイル見切れ対策) */
+@media (max-width: 640px) {
+  .article-content table,
+  .static-content table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 /* Embedded videos/iframes */
 .article-content iframe {
   max-width: 100%;
