@@ -1,88 +1,69 @@
 # kakiokosi.com SEOアクションプラン
 
 **更新:** 2026-06-18
-**現在スコア:** 86/100（6/11: 79 / 3/28: 74）→ HIGH#1-2 修正済みで Schema 91→96 相当
-**目標スコア:** 90/100+
-
-PR #38（出典遡及・ピラー増強・OG画像・リダイレクト・schema・フォント）はマージ＆本番デプロイ済み。本プランは再監査(2026-06-16)で残った取りこぼしと新規発見。致命的問題はゼロ。
+**現在スコア:** 91/100（6/16: 86 / 6/11: 79 / 初回: 74）
+**状態:** 致命的問題ゼロ。PR #38-#41 で主要課題は解消済み。残りは Low〜中の磨き込み。
 
 ---
 
-## ✅ 完了済み（2026-06-18、ブランチ seo/schema-cleanup-followup・本番デプロイ済み）
-
-### 1. ✅ CollectionPageスキーマの匿名WebSite重複を解消【完了】
-`app/lib/schema.ts` の `collectionPageSchema` を `isPartOf:{ "@id": ".../#website" }` に修正。
-本番確認: home/category/tag すべてWebSiteノードが2→**1個**に（約314ページに波及）。
-
-### 2. ✅ FAQPage埋め込みの除去（4記事）【完了】
-migration 0032 で id 1380-1383 の `posts.content` 末尾の `<script>FAQPage` を切除（本番適用済み）。
-本番確認: FAQPage=0、可視「よくある質問」本文は保持、末尾`</section>`で正常終端。
-
-### 3. ✅ 法務ページの代表者名「AI ATAKA」【誤検知・対応不要】
-**監査の誤検知**。「AI ATAKA」は株式会社ユリカの**正式な代表者名**とオーナー確認済み（2026-06-18）。変更不要。
-※記事著者バイライン「安宅 基（パジ）」とは表記が異なるが、法人代表名 vs 著者ペンネームとして意図的。
-
-## HIGH / MEDIUM（残作業）
-
-### 4. img alt欠落12件の補完【旧business記事中心】
-**影響:** a11y・画像SEO。例: /share/business/157 等。WP移行残骸。
+## ✅ 完了済み（PR #38-#41・全て本番デプロイ＆検証済み）
+- コンテンツ品質: IT記事の出典・著者、ピラー3本増強、薄ページ増強
+- 出典付与: 旧第三者スピーチ22本に検証済み原典URL（+isBasedOn）
+- Schema: FAQPage除去、CollectionPage @id化（WebSite重複解消）、isBasedOn CreativeWork型
+- Performance: **フォントセルフホスト化**（render-blocking CSS撤去→TBT 400-785ms→56-66ms、LCP<1s）
+- Technical: /share→/ 301統合、末尾スラッシュ301、パンくず修正
+- 画像: OG専用カード78ページ、旧WP画像11枚に記述的alt
+- a11y: guide表の横スクロール化、ハンバーガー44px
+- 正確性: 年号誤り訂正（id85/185）
 
 ---
 
-## ✅ 完了済み（2026-06-18、ブランチ seo/sources-and-selfhost-fonts・本番デプロイ済み）
+## 残作業
 
-### 5. ✅ 旧第三者スピーチの出典付与【完了: 22本に検証済URL】
-migration 0033。出典対象39本を4調査エージェントで原典特定→**筆者がcurl/oEmbedで最終200を独立再検証**し、**22本**に source_url を付与（TED 8 / 著名スピーチ10 / 国内2 / 国内その他2）。例: 87=Jobs Stanford公式YouTube、91=TED JR、93=オバマ大統領公式アーカイブ、643=UN Web TV(ムヒカ)、881=Berkeley公式PDF。記事テンプレが「出典」ボックス + Article schema `isBasedOn` を自動表示（本番確認済み）。
-残16本（72,73,76,77,78,79,84,86,175,185,311,323,325,641,936,82）は**原典が実際に消失**（Ustream閉鎖・YouTube動画削除・ニコ生タイムシフト終了）で確証URLなし→捏造せず付与見送り。あわせて1380-1383（paji原作のhow-to）に著者付与。
-※調査で年号誤りも検出（id133タイトル「Yes We Can」は実際2008シカゴ勝利演説、id85は2011-02-09、id185は2012）— 本文修正は将来タスク。
+### MEDIUM（schema完全性・低工数・高効果）
 
-### 6. ✅ フォントのセルフホスト化【完了: 1.7MB・3rd-party撤廃】
-`scripts/generate-fonts.py`。Noto Sans JP 400/700 + Noto Serif JP 900 を、**サイト全コンテンツ実使用グリフ＋常用漢字2,136＋仮名/約物/ラテン/IPA基底レンジ**(計4,929字)にサブセットし content-hash 付き woff2 を出力（計**1.74MB**、全サブセット自前ホスト時の18MBを回避）。@font-faceは `app/lib/font-manifest.ts` 経由で `root.tsx` の`<head>`にインライン、Sans400をpreload。Google Fonts css2 の **344KB render-blocking CSS + fonts.googleapis/gstatic 接続を完全撤廃**、CSPを `font-src 'self'` に厳格化、`/fonts/*` を `public/_headers` で immutable キャッシュ。**現行コンテンツのCJK/仮名tofuゼロ**を実検証（残欠落は元々Noto JPに無いIPA/アラビアのみ＝退行なし）。本番確認済み。
-※真の「ページ別動的サブセット(0.1-0.4MB)」は3日毎cronの新規記事でtofuリスクがあり不採用。常用漢字込みの固定サブセットで将来記事も概ね保護し、グリフ網羅は維持。新記事で稀字が増えたら `python3 scripts/generate-fonts.py` 再実行→コミット。
+#### 1. Article schemaを#websiteグラフに連結
+**影響:** 構造化データの完全性（159記事が現在rootグラフから孤立）
+**対象:** `app/routes/share.$category.$id.tsx`（Article定義）
+Articleに `@id`（記事URL#article等）と `isPartOf: { "@id": "https://kakiokosi.com/#website" }` を追加。PR #40で実証済みの`schema.ts`パターンを流用。これで#website参照が339→498に連結。
 
-## MEDIUM（残作業・1ヶ月以内）
+#### 2. isBasedOnの音声/動画型化
+**影響:** エンティティ精度・リッチ表示
+**対象:** `app/routes/share.$category.$id.tsx:162-169`
+ソース型は自明（voicy.jp 16=AudioObject / youtube・ted 14=VideoObject / それ以外=CreativeWith据置）。既存の`post.voicy_url`/`spotify_url`判定を流用して分岐。
 
-### 7. ハイドレーションのメインスレッド負荷削減【INP/TBT・Performance残課題の本丸】
-**影響:** INPの余裕・Performanceスコアを高80s帯へ
-読み取り中心ページ（約90%が静的テキスト）。インタラクティブ島の選択的/遅延ハイドレーション + 111-116KB(gzip)バンドルのコード分割でロングタスク400-785msを<50msチャンクに分割。フォント対応が済んだので、Performance改善の残る最大レバーはこれ。
+#### 3. society/936（登丸賢美 TED）の出典付与
+**影響:** 出典カバレッジ（残16本中、唯一回収可能とcontent agentが判定）
+TEDトークURLを調査・curl検証して付与（migration）。
 
-### 8. category economy/culture の増強 or 整理
-1,053/1,056字（記事3-4本ゆえの構造的thin）。記事増加まで現状維持でも可。
+### LOW
 
----
-
-## LOW（バックログ）
-
-| # | タスク | 状態 |
+| # | タスク | 状態/メモ |
 |---|---|---|
-| 9 | **ゾーン側リダイレクト修正**: `http://kakiokosi.com/`→`/share`→`/`の2ホップ解消。Cloudflareダッシュボード(kakiokosiゾーン)で`/→/share`ルールを`/→/`に | ⚠️**未対応・要手動**（コード外。wrangler権限はHumanadsaiアカウントでゾーンは別アカウント） |
-| 10 | guide比較表のモバイル見切れ | ✅ 完了（app.css: .static/.article-content table を `@media(max-width:640px)` で `overflow-x:auto`、static-content表スタイルも追加） |
-| 11 | 長いタイトル12件(>60字)の短縮 | 見送り（indexされた既存タイトルの改変はSEOリスク、効果も限定的なため意図的に保留） |
-| 12 | タップターゲット<44px | ✅ ハンバーガー44px化(p-2.5)完了。インラインリンク/ロゴは本文レイアウトへの影響が大きく保留 |
-| 13 | isBasedOn の型付け / 話者Person | ✅ isBasedOn を `CreativeWork` 型に。話者Person(@id+Wikidata)は記事ごとの話者データ整備が必要なため別途 |
-| 14 | `/share/tag/*` 空タグの応答 | ✅ 調査の結果、tag routeは既に `total===0` で404を返す実装済み＝502は一時障害（コード修正不要） |
-| 15 | 旧WP画像の空alt(11枚) | ✅ 完了（migration 0034、実画像を確認し記述的altを付与: post 153/157/175） |
-| 16 | 編集部注の年号誤り | ✅ 完了（migration 0035: id85 2010→2011、id185 2014→2012。id133タイトルは妥当で変更なし） |
+| 4 | **入口2ホップ301**（`http://→/share→/`） | ⚠️**要手動**: Cloudflareダッシュボード(kakiokosiゾーン)で`/→/share`ルールを`/→/`に。wrangler権限外 |
+| 5 | /aboutに運営者バイオ段落（paji/安宅基の実績） | E-E-A-T。content/about本文の追記（migration） |
+| 6 | ホームのサイトマップlastmodを子記事にcascade | 現在7日stale。`sitemap[.]xml.tsx`でホームのlastmodを最新記事から算出 |
+| 7 | パンくず等リンクのタップ領域<44px | モバイルa11y。py拡張 |
+| 8 | 話者Person+Wikidata sameAs（Articleのabout） | 差別化大だが話者→QIDデータ整備が前提 |
+| 9 | Serif900サブセットを見出し用に縮小 | 初回フォント1.66MBの内668KB。見出し実使用字に絞れば削減 |
+| 10 | CSP `'unsafe-inline'`のnonce/hash化 | セキュリティ硬化 |
+
+### 判断保留（やらない理由あり）
+- **長いタイトル3本の短縮**: index済みタイトル改変のSEOリスク＞効果
+- **ピラーへのFAQPage schema再追加**: 可視Q&Aは既にあるが、FAQPageは2023年8月以降リッチリザルト対象外。再追加の実益が薄く、除去方針との一貫性を優先
+- **/companyの代表者「AI ATAKA」**: 正式名称（オーナー確認済み・誤検知ではない）
 
 ---
 
-## 残る未対応（2026-06-18時点）
-
-- **[Medium] ハイドレーションのINP/TBT削減**（項目7）— Performance改善の最後の本丸。RR7の選択的/遅延ハイドレーションはアーキテクチャに踏み込むため、専用の検証付き対応が必要（本セッションでは未着手）。
-- **[Low] ゾーン側2ホップ301**（項目9）— Cloudflareダッシュボード手動（kakiokosiゾーンはwrangler権限外）。
-- **[Low] 話者Personエンティティ**（項目13後半）— 記事ごとの話者・Wikidata紐付けデータ整備が前提。
-- 意図的見送り: 長いタイトル短縮（項目11）。
-
-## スコア予測
-
-| アクション群 | 状態 |
-|---|---|
-| HIGH 1-4（schema/FAQ/出典/著者） | ✅ 完了（PR #39/#40）→ Schema 91→96 |
-| MEDIUM 5-6（出典付与・フォントセルフホスト） | ✅ 完了（PR #40）→ Content 78→82, Perf改善 |
-| MEDIUM 7（ハイドレーション） | 未着手 |
-| LOW 10/12/13/14/15/16 | ✅ 完了（PR #41）→ a11y/モバイル/schema/正確性 |
-| 総合 | **86 → 概ね 88-89 見込み** |
+## スコア内訳と予測
+| カテゴリ | 現在 | 上限到達に必要な作業 |
+|---|---|---|
+| Technical 95 | 入口2ホップ301（手動）で97+ |
+| Content 84 | /about運営者バイオ + 出典936 で 86-87 |
+| Schema 95 | Article @id連結 + isBasedOn型化 で 98 |
+| Performance 93 | ほぼ天井（Serif縮小で微増） |
+| **総合 91** | 上記MEDIUM 3件で **92-93**、手動301含めて **93-94** |
 
 ---
 
-*2026-06-16 監査 → 2026-06-18 改善実施（PR #39/#40/#41）。前回プランはgit履歴参照。*
+*2026-06-18 第4回監査。改善履歴 PR #38-#41 は git 参照。*
