@@ -18,23 +18,18 @@
 
 ---
 
+## ✅ 完了済み追加分（PR #42・2026-06-18・本番デプロイ＆検証済み）
+
+#### 1. ✅ Article schemaを#websiteグラフに連結
+`app/routes/share.$category.$id.tsx`: Article に `@id`（`<記事URL>#article`）と `isPartOf: { "@id": ".../#website" }` を追加。本番で連結確認。
+
+#### 2. ✅ isBasedOnの音声/動画型化
+ソースURLで型分岐: youtube・ted→**VideoObject** / voicy・spotify→**AudioObject** / その他→CreativeWork。本番で87=VideoObject・1388=AudioObject・89=CreativeWork を確認。
+
+#### 3. ⛔ society/936（登丸賢美 TED）の出典 — 回収不能
+WebSearch複数回・前回エージェントとも**検証可能なTED/TEDx URLを特定できず**。捏造しない方針により付与見送り（出典なお16本のまま）。
+
 ## 残作業
-
-### MEDIUM（schema完全性・低工数・高効果）
-
-#### 1. Article schemaを#websiteグラフに連結
-**影響:** 構造化データの完全性（159記事が現在rootグラフから孤立）
-**対象:** `app/routes/share.$category.$id.tsx`（Article定義）
-Articleに `@id`（記事URL#article等）と `isPartOf: { "@id": "https://kakiokosi.com/#website" }` を追加。PR #40で実証済みの`schema.ts`パターンを流用。これで#website参照が339→498に連結。
-
-#### 2. isBasedOnの音声/動画型化
-**影響:** エンティティ精度・リッチ表示
-**対象:** `app/routes/share.$category.$id.tsx:162-169`
-ソース型は自明（voicy.jp 16=AudioObject / youtube・ted 14=VideoObject / それ以外=CreativeWith据置）。既存の`post.voicy_url`/`spotify_url`判定を流用して分岐。
-
-#### 3. society/936（登丸賢美 TED）の出典付与
-**影響:** 出典カバレッジ（残16本中、唯一回収可能とcontent agentが判定）
-TEDトークURLを調査・curl検証して付与（migration）。
 
 ### LOW
 

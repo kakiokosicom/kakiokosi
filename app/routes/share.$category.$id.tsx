@@ -136,11 +136,22 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
     CATEGORY_LABELS_EN[post.primary_category] ?? post.primary_category;
 
   const articleUrl = `https://kakiokosi.com/share/${post.primary_category}/${post.id}`;
+  // 出典(原典)のURLと、その実体に応じた schema.org 型。
+  // youtube/ted=VideoObject、voicy/spotify=AudioObject、その他(記事/PDF等)=CreativeWork。
+  const sourceUrl = post.source_url || post.voicy_url || post.spotify_url || null;
+  const sourceType = sourceUrl
+    ? /youtube\.com|youtu\.be|ted\.com/.test(sourceUrl)
+      ? "VideoObject"
+      : /voicy\.jp|spotify\.com/.test(sourceUrl)
+        ? "AudioObject"
+        : "CreativeWork"
+    : null;
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": "Article",
+        "@id": `${articleUrl}#article`,
         headline: post.title,
         description: post.excerpt || post.title,
         url: articleUrl,
@@ -159,14 +170,10 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
             url: "https://kakiokosi.com/images/default-og.png",
           },
         },
-        ...((post.source_url || post.voicy_url || post.spotify_url)
-          ? {
-              isBasedOn: {
-                "@type": "CreativeWork",
-                url: post.source_url || post.voicy_url || post.spotify_url,
-              },
-            }
+        ...(sourceUrl
+          ? { isBasedOn: { "@type": sourceType, url: sourceUrl } }
           : {}),
+        isPartOf: { "@id": "https://kakiokosi.com/#website" },
         inLanguage: "ja",
         ...(tags.length > 0
           ? { keywords: tags.map((t) => t.name).join(", ") }
