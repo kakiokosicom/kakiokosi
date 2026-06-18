@@ -22,11 +22,9 @@ export function collectionPageSchema(opts: {
     name: opts.name,
     description: opts.description,
     url: opts.url,
-    isPartOf: {
-      "@type": "WebSite",
-      name: SITE_NAME,
-      url: SITE_URL,
-    },
+    // root.tsx の GLOBAL_JSON_LD にある WebSite ノードを @id 参照する
+    // （匿名 WebSite ノードの重複を避ける。home/category/tag/全ページネーションに波及）
+    isPartOf: { "@id": `${SITE_URL}/#website` },
     inLanguage: "ja",
     ...(opts.numberOfItems != null
       ? { mainEntity: { "@type": "ItemList", numberOfItems: opts.numberOfItems } }
