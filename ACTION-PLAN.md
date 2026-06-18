@@ -29,19 +29,22 @@ migration 0032 で id 1380-1383 の `posts.content` 末尾の `<script>FAQPage` 
 
 ---
 
-## MEDIUM（1ヶ月以内）
+## ✅ 完了済み（2026-06-18、ブランチ seo/sources-and-selfhost-fonts・本番デプロイ済み）
 
-### 5. 旧第三者スピーチ約43本の出典付与 or 付加価値追加
-**影響:** 「無付加価値の複製」リスク低減・著作権配慮・AI引用信頼性
-source_url/isBasedOn が空（例: politics/643, business/175）。原典URLの付与、または導入・解説・要約の追加で keeper 化。一部は抜粋のみで素の書き起こしに近く優先度高め。
+### 5. ✅ 旧第三者スピーチの出典付与【完了: 22本に検証済URL】
+migration 0033。出典対象39本を4調査エージェントで原典特定→**筆者がcurl/oEmbedで最終200を独立再検証**し、**22本**に source_url を付与（TED 8 / 著名スピーチ10 / 国内2 / 国内その他2）。例: 87=Jobs Stanford公式YouTube、91=TED JR、93=オバマ大統領公式アーカイブ、643=UN Web TV(ムヒカ)、881=Berkeley公式PDF。記事テンプレが「出典」ボックス + Article schema `isBasedOn` を自動表示（本番確認済み）。
+残16本（72,73,76,77,78,79,84,86,175,185,311,323,325,641,936,82）は**原典が実際に消失**（Ustream閉鎖・YouTube動画削除・ニコ生タイムシフト終了）で確証URLなし→捏造せず付与見送り。あわせて1380-1383（paji原作のhow-to）に著者付与。
+※調査で年号誤りも検出（id133タイトル「Yes We Can」は実際2008シカゴ勝利演説、id85は2011-02-09、id185は2012）— 本文修正は将来タスク。
 
-### 6. フォントのセルフホスト+動的サブセット化【Performance本丸】
-**影響:** FCP/LCP −0.5〜1.0s、347KBのrender-blocking CSS除去
-7→3ウェイト化は済んだが、CJKは unicode-rangeサブセット（124×3）が転送量の支配要因で1MB級が残存。セルフホスト+ページ別グリフサブセットで0.1-0.4MBへ。
+### 6. ✅ フォントのセルフホスト化【完了: 1.7MB・3rd-party撤廃】
+`scripts/generate-fonts.py`。Noto Sans JP 400/700 + Noto Serif JP 900 を、**サイト全コンテンツ実使用グリフ＋常用漢字2,136＋仮名/約物/ラテン/IPA基底レンジ**(計4,929字)にサブセットし content-hash 付き woff2 を出力（計**1.74MB**、全サブセット自前ホスト時の18MBを回避）。@font-faceは `app/lib/font-manifest.ts` 経由で `root.tsx` の`<head>`にインライン、Sans400をpreload。Google Fonts css2 の **344KB render-blocking CSS + fonts.googleapis/gstatic 接続を完全撤廃**、CSPを `font-src 'self'` に厳格化、`/fonts/*` を `public/_headers` で immutable キャッシュ。**現行コンテンツのCJK/仮名tofuゼロ**を実検証（残欠落は元々Noto JPに無いIPA/アラビアのみ＝退行なし）。本番確認済み。
+※真の「ページ別動的サブセット(0.1-0.4MB)」は3日毎cronの新規記事でtofuリスクがあり不採用。常用漢字込みの固定サブセットで将来記事も概ね保護し、グリフ網羅は維持。新記事で稀字が増えたら `python3 scripts/generate-fonts.py` 再実行→コミット。
 
-### 7. ハイドレーションのメインスレッド負荷削減【INP/TBT】
+## MEDIUM（残作業・1ヶ月以内）
+
+### 7. ハイドレーションのメインスレッド負荷削減【INP/TBT・Performance残課題の本丸】
 **影響:** INPの余裕・Performanceスコアを高80s帯へ
-読み取り中心ページ（約90%が静的テキスト）。インタラクティブ島の選択的/遅延ハイドレーション + 111-116KB(gzip)バンドルのコード分割でロングタスク400-785msを<50msチャンクに分割。
+読み取り中心ページ（約90%が静的テキスト）。インタラクティブ島の選択的/遅延ハイドレーション + 111-116KB(gzip)バンドルのコード分割でロングタスク400-785msを<50msチャンクに分割。フォント対応が済んだので、Performance改善の残る最大レバーはこれ。
 
 ### 8. category economy/culture の増強 or 整理
 1,053/1,056字（記事3-4本ゆえの構造的thin）。記事増加まで現状維持でも可。
