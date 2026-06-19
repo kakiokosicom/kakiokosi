@@ -35,9 +35,9 @@ WebSearch複数回・前回エージェントとも**検証可能なTED/TEDx URL
 
 | # | タスク | 状態/メモ |
 |---|---|---|
-| 4 | **入口2ホップ301**（`http://→/share→/`） | ⚠️**要手動**: Cloudflareダッシュボード(kakiokosiゾーン)で`/→/share`ルールを`/→/`に。wrangler権限外 |
-| 5 | /aboutに運営者バイオ段落（paji/安宅基の実績） | E-E-A-T。content/about本文の追記（migration） |
-| 6 | ホームのサイトマップlastmodを子記事にcascade | 現在7日stale。`sitemap[.]xml.tsx`でホームのlastmodを最新記事から算出 |
+| 4 | **入口2ホップ301**（`http://→/share→/`） | ⚠️**要手動・未対応**: Cloudflareダッシュボード(kakiokosiゾーン)で`/→/share`ルールを`/→/`に。wrangler権限外 |
+| 5 | /aboutに運営者バイオ段落（paji/安宅基） | ✅ 完了（PR #43, migration 0036）。authors.ts準拠の経歴を「編集部について」に明記、外部プロフィールへリンク |
+| 6 | ホームのサイトマップlastmod | ✅ 完了（PR #43）。`sitemap[.]xml.tsx`を全記事MAX(updated_at)算出に修正、06-11→06-18 |
 | 7 | パンくず等リンクのタップ領域<44px | モバイルa11y。py拡張 |
 | 8 | 話者Person+Wikidata sameAs（Articleのabout） | 差別化大だが話者→QIDデータ整備が前提 |
 | 9 | Serif900サブセットを見出し用に縮小 | 初回フォント1.66MBの内668KB。見出し実使用字に絞れば削減 |
