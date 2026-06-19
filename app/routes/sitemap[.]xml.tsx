@@ -28,8 +28,13 @@ export async function loader({ context }: Route.LoaderArgs) {
 
   const urls: string[] = [];
 
-  // Top page — use most recent updated_at (canonical is /)
-  urls.push(entry(baseUrl, "/", posts.results[0]?.updated_at || posts.results[0]?.published_at));
+  // Top page — 最新の「更新」日を反映（published_at DESC 順なので results[0] は
+  // 最新公開記事であり最新更新記事とは限らない。全記事の MAX(updated_at) を取る）
+  const topLastmod = posts.results.reduce<string>((max, p) => {
+    const m = p.updated_at || p.published_at || "";
+    return m > max ? m : max;
+  }, "");
+  urls.push(entry(baseUrl, "/", topLastmod || null));
 
   // Article pages
   for (const post of posts.results) {
