@@ -18,6 +18,23 @@ Cloudflareリダイレクトルール#1（`http://kakiokosi.com/`→`/share`）�
 - **話者Person + Wikidata sameAs**（PR本体）: `app/lib/speakers.ts` を新設し、第三者スピーチ40本に話者を Wikidata QID 付き Person として Article `about` に出力。全QIDは Wikidata API で人物実体(P31=Q5)を検証（孫正義=Q717038・JR=Q1312565 等、当初の推測QIDは誤りで検証により訂正）。本番確認済み。Schema 97→99相当。
 - **新規コンテンツ3本 + 自動公開キュー再始動**（migration 0037）: paji本人のVoicy原液3本をPAJI-STYLE-GUIDE準拠で記事化（1389-1391、各4.3-5.6千字、独自フレームワーク・出典/AudioObject/著者付き）。**枯渇していたITキュー(0→3)を回復**し、停止中のcron自動公開を再始動。1389は即時公開・本番検証済み、1390/1391はcronが順次公開（3日毎）。
 
+## ✅ 2026-06-23(続2) 完了: 自動公開パイプラインの設計実装
+- **「一次記録」ラベル**（migration 0038）: 出典消失の旧書き起こし15本（会見/討論/決算説明会/全文スピーチ/インタビュー）の編集部注に「本記事は当時の発言を書き起こした一次記録です」を追記し、Experience/originalityシグナルに転換（重複コンテンツ懸念の解消）。175(まとめ)・936(TED=外部に原典)は性質が違うため除外。
+- **機械点検ゲート付き自動公開**（workers/app.ts）: 3日毎cronが公開前に `qualityGate()` で各下書きを自動点検（文字数≥1800・h2構造・h1混入なし・excerpt有・タイトル長・出典/著者の来歴・プレースホルダ/壊れJSON-LDなし）。合格1本のみ公開、不合格は `needs_review` に退避して構造化ログに理由記録。残キュー深度と `queue_low` も出力。決定的チェックでLLM不要・CF内完結・`wrangler tail`で点検結果を確認可。
+
+### 運用設計（自動公開＋点検）
+```
+[生成] オンデマンド一括（Claude=私が原液→パジ記事を数本INSERT。キュー低下時）
+   ↓ IT下書きキュー
+[公開] workers cron（3日毎）→ qualityGate → 合格のみ published / 不合格は needs_review
+   ↓
+[点検] cronの構造化ログ（published / held_for_review+理由 / queue_remaining / queue_low）
+```
+- 補充の合図: ログの `queue_low=true`（残<2）を見たらオンデマンド生成を実行
+- 原液プール残 約420本（数十回分の供給余力）
+
+---
+
 ## 残作業（コード作業では完結できないもの）
 
 ### 要・データ整備
