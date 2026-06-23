@@ -60,6 +60,7 @@ export const OG_KEYS: ReadonlySet<string> = new Set([
   "post-1386",
   "post-1387",
   "post-1388",
+  "post-1389",
   "page-about",
   "page-ai-hatarakikata",
   "page-company",

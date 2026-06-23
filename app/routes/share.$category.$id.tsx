@@ -7,6 +7,7 @@ import { Icon } from "~/components/icon";
 import { imageSrcSet, imageSrc } from "~/lib/image";
 import { getAuthor, authorJsonLd } from "~/lib/authors";
 import { ogImageUrl } from "~/lib/og-manifest";
+import { speakerAbout } from "~/lib/speakers";
 
 /** Generate a meta description from article HTML content when no excerpt exists. */
 function generateExcerpt(html: string, fallback: string): string {
@@ -172,6 +173,10 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
         },
         ...(sourceUrl
           ? { isBasedOn: { "@type": sourceType, url: sourceUrl } }
+          : {}),
+        // 元の講演・インタビューで話した人を Wikidata 紐付き Person として明示
+        ...(speakerAbout(post.id).length > 0
+          ? { about: speakerAbout(post.id) }
           : {}),
         isPartOf: { "@id": "https://kakiokosi.com/#website" },
         inLanguage: "ja",
