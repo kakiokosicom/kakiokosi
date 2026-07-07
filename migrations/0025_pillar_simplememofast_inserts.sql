@@ -20,6 +20,13 @@
 -- 1. mojikoshi-tool: 「用途別おすすめツール」セクション末尾に
 --    新規 h3「録音中のフックメモを残したい」を追加 (template B 改)
 --    挿入位置: 既存 h3「開発者としてAPIで…」の末尾 と 次の h2「AI文字起こしツールの選び方」の間
+--
+--    ⚠️ 2026-07-07 本番検証: このセクションは実行不要（すでに目的達成済み）。
+--    ページはその後の再構成でアンカー（「APIドキュメントが充実しており…」「AI文字起こし
+--    ツールの選び方」）が消滅しており REPLACE は空振りする。Simple Memo リンクは現行の
+--    h2「関連ツール：録音中のフックメモを残す」セクションに 1 本存在する（リンク数は方針通り）。
+--    再実行すると content 不変のまま updated_at だけ更新され偽の鮮度シグナルになるため、
+--    本 migration 全体を本番へ再適用しないこと（2/3 セクションも適用済み・ガードで skip される）。
 -- ============================================================================
 UPDATE pages
 SET content = REPLACE(
@@ -37,7 +44,7 @@ SET content = REPLACE(
   ),
   updated_at = datetime('now')
 WHERE slug = 'mojikoshi-tool'
-  AND content NOT LIKE '%<h3>録音中のフックメモを残したい</h3>%';
+  AND instr(content, '<h3>録音中のフックメモを残したい</h3>') = 0;
 
 -- ============================================================================
 -- 2. gijiroku: 末尾の captio クロスリンクセクション直前に
@@ -54,7 +61,7 @@ SET content = REPLACE(
   ),
   updated_at = datetime('now')
 WHERE slug = 'gijiroku'
-  AND content NOT LIKE '%<h2>関連ツール</h2>%';
+  AND instr(content, '<h2>関連ツール</h2>') = 0;
 
 -- ============================================================================
 -- 3. interview-kakiokoshi: ステップ2 (タイムスタンプ言及) の直後に
@@ -77,4 +84,4 @@ SET content = REPLACE(
   ),
   updated_at = datetime('now')
 WHERE slug = 'interview-kakiokoshi'
-  AND content NOT LIKE '%後工程のケバ取り・校正の手がかりとして受信箱で処理できます%';
+  AND instr(content, '後工程のケバ取り・校正の手がかりとして受信箱で処理できます') = 0;
