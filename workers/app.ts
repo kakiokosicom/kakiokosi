@@ -14,6 +14,73 @@ const requestHandler = createRequestHandler(
   import.meta.env.MODE
 );
 
+const SITE = "https://kakiokosi.com";
+
+// IndexNow（Bing/Naver等 → ChatGPT/Copilot引用経路）。Googleは非対応のため
+// Google向けはsitemap lastmodのみ。通知はベストエフォートで、失敗しても
+// 公開処理には影響させない。キーファイルは public/<key>.txt で配信。
+const INDEXNOW_KEY = "97ee09b96812fa3564276b87ca6454ac";
+
+async function notifyIndexNow(urls: string[]): Promise<void> {
+  try {
+    await fetch("https://api.indexnow.org/indexnow", {
+      method: "POST",
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({
+        host: "kakiokosi.com",
+        key: INDEXNOW_KEY,
+        keyLocation: `${SITE}/${INDEXNOW_KEY}.txt`,
+        urlList: urls,
+      }),
+    });
+  } catch {
+    // best-effort: IndexNowの失敗は無視
+  }
+}
+
+// ゾーン側リダイレクトルールから漏れた旧WordPress URLの301マップ
+// （GSC「見つかりませんでした(404)」実測分。行き先は現行の同一記事）。
+// デコード+小文字化+末尾スラッシュ除去後の部分一致。パート違い（-2等の
+// WPスラッグ接尾辞）は長いものを先に置いて誤マッチを防ぐ。
+const LEGACY_REDIRECTS: Array<[string, string]> = [
+  ["大前研一が語る福島原発事故part１", "/share/society/302"],
+  ["大前研一が語る福島原発事故part２", "/share/society/301"],
+  ["大前研一が語る福島原発事故part３", "/share/society/300"],
+  ["中野剛志先生のよくわかるtpp解説", "/share/economy/237"],
+  ["まどか☆マギカ」-2", "/share/entertainment/232"],
+  ["まどか☆マギカ」-3", "/share/entertainment/231"],
+  ["まどか☆マギカ」-4", "/share/entertainment/230"],
+  ["まどか☆マギカ」", "/share/entertainment/233"],
+  ["孫正義vs池田信夫「光の道」対談-2", "/share/business/291"],
+  ["孫正義vs池田信夫「光の道」対談-3", "/share/business/288"],
+  ["孫正義vs池田信夫「光の道」対談-4", "/share/business/286"],
+  ["孫正義vs池田信夫「光の道」対談", "/share/business/292"],
+  ["津田大介×児玉龍彦のustream対談-2", "/share/society/263"],
+  ["津田大介×児玉龍彦のustream対談-3", "/share/society/262"],
+  ["津田大介×児玉龍彦のustream対談-4", "/share/society/260"],
+  ["津田大介×児玉龍彦のustream対談", "/share/society/264"],
+  ["ボランティアスタッフの応募フォーム", "/share/about"],
+  ["/volunteer", "/share/about"],
+];
+
+function matchLegacyRedirect(pathname: string): string | null {
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(pathname);
+  } catch {
+    return null;
+  }
+  const p = decoded.toLowerCase().replace(/\/+$/, "");
+  // 現行URL空間は対象外（誤爆防止）
+  if (p.startsWith("/share/") || p.startsWith("/assets/") || p.startsWith("/uploads/")) {
+    return null;
+  }
+  for (const [needle, target] of LEGACY_REDIRECTS) {
+    if (p.includes(needle)) return target;
+  }
+  return null;
+}
+
 export default {
   /**
    * Scheduled handler — auto-publishes the oldest IT draft that passes an
@@ -61,6 +128,11 @@ export default {
       held.push({ id: post.id, issues });
     }
 
+    if (publishedId !== null) {
+      // 新記事とホーム（lastmod更新）をIndexNowへ通知
+      await notifyIndexNow([`${SITE}/share/it/${publishedId}`, `${SITE}/`]);
+    }
+
     const remaining = await env.DB.prepare(
       `SELECT COUNT(*) AS c FROM posts WHERE status='draft' AND primary_category='it'`
     ).first<{ c: number }>();
@@ -80,6 +152,12 @@ export default {
 
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+
+    // 旧WP URLの301（末尾スラッシュ正規化より先に処理して1ホップで確定させる）
+    const legacy = matchLegacyRedirect(url.pathname);
+    if (legacy) {
+      return Response.redirect(`${SITE}${legacy}`, 301);
+    }
 
     // 末尾スラッシュURLの200応答は重複URLを生むため、正規形へ301で寄せる
     // （ルート / と静的アセットは除外）
