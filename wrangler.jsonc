@@ -3,6 +3,10 @@
   "name": "kakiokosi",
   "compatibility_date": "2025-04-04",
   "main": "./workers/app.ts",
+  "routes": [
+    { "pattern": "kakiokosi.com", "custom_domain": true },
+    { "pattern": "www.kakiokosi.com", "custom_domain": true }
+  ],
   "triggers": {
     // Auto-publish 1 IT draft every 3 days at 00:00 UTC (09:00 JST)
     "crons": ["0 0 */3 * *"]
@@ -11,7 +15,8 @@
     {
       "binding": "DB",
       "database_name": "kakiokosi-db",
-      "database_id": "53cf17c7-30d2-49e8-9ba2-85cc6218ac17"
+      // info@kakiokosi.com アカウント側のD1（旧Humanadsai側: 53cf17c7-30d2-49e8-9ba2-85cc6218ac17）
+      "database_id": "a5cb03d2-44eb-4d43-9c1c-90782ffe06a7"
     }
   ]
 }

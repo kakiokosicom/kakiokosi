@@ -2,7 +2,24 @@
 
 **作成:** 2026-07-07（監査v5フォロー）
 **目的:** Worker + D1 を Humanadsai アカウントから kakiokosi.com ゾーンのあるアカウントへ移し、ねじれ構造を解消する
-**状態:** Phase 0 完了。**Phase 1 の認証情報待ちでブロック中**（下記2択のどちらかをユーザーが用意した時点で、以降は Claude Code が実行可能）
+**状態:** 2026-07-07 13:40 — **Phase 3 カットオーバー完了（本番は新アカウント配信中）**。残り: Phase 4 後片付け（7/10以降）と、必要になった時のSecrets投入（下記）
+
+## Phase 3 実施記録（2026-07-07 13:35 JST）
+
+- Secrets 3件（ANTHROPIC_API_KEY / GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET）は**投入せずにカットオーバー**。使用箇所を確認した結果、前者=dashboardのAI執筆（現運用はClaude Code直接執筆で不使用）、後者=dashboardのGoogleログインのみで、公開サイト・cron・IndexNowは非依存。**dashboardログインを使う時に `env -u CLOUDFLARE_API_TOKEN npx wrangler secret put GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET` を投入すること**
+- カットオーバー方式: 手順書のDNS手動切替ではなく、`wrangler.jsonc` に routes（custom_domain: true × kakiokosi.com / www）を追加して deploy。**注意: RR7ビルドが設定を `build/server/wrangler.json` にコピーするため、wrangler.jsonc 変更後は `npm run build` 必須**（ビルドせず deploy すると旧設定で飛ぶ）
+- カットオーバー前差分チェック: 旧D1 max(updated_at)=07-07 09:00:27（バックアップ09:47より前）で差分ゼロ → 再インポート省略
+- 検証済み: 本番 root 200 / http→https 301 / www→apex 301 / sitemap 104 / 記事200+schema / 404、`wrangler tail` でマーク付きリクエストが新Worker到達を確認
+- 副次効果: workers.dev は自動無効化（404、重複ホスト解消）。**ゾーン側誤301も解消** — 光の道対談-4 が worker側マップの正しい /share/business/286 に1ホップで到達（付録1は完了扱い）
+- wranglerの罠: 旧アカウントのトークンでコマンドを実行すると `node_modules/.cache/wrangler/wrangler-account.json` にaccount_idがキャッシュされ、以後のOAuth実行が旧アカウントに向く。**新アカウント操作は `CLOUDFLARE_ACCOUNT_ID=8798d5a0bf5bab82c8f0d1e3a9087374` を明示**
+
+## Phase 2 実施記録（2026-07-07）
+
+- 移行先D1: 既存の空 `kakiokosi-db`（uuid `a5cb03d2-44eb-4d43-9c1c-90782ffe06a7`、2026-03-28作成の残骸）を全テーブルDROPして再利用。`wrangler.jsonc` の database_id 差し替え済み
+- インポート注意点: D1は1ステートメント100KB制限。巨大記事3件（posts id=79,234,307）のINSERTが超過するため、`backups/kakiokosi-db-2026-07-07-split.sql` を生成（INSERT+content追記UPDATE分割、スクリプトはセッションscratchpadの split_big_inserts.py）して投入。**今後の再インポートも split 版を使うこと**
+- 検証済み: posts 598 / pages 30 / tags 385（バックアップと完全一致）、分割3記事の本文長一致
+- デプロイ済み: `https://kakiokosi.royal-surf-4665.workers.dev`（cron登録済み）。トップ200 / 記事200 / sitemap 104 / robots / 404 / Article schema 確認済み
+- Secrets: APP_URL 設定済み。残り3件はユーザーが投入
 
 ## 現状の構成（ねじれ）
 
