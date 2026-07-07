@@ -16,3 +16,6 @@ worker-configuration.d.ts
 # Migration seed data (too large for git, regenerate with scripts/migrate.mjs)
 migrations/0002_seed.sql
 migrations/seed_batches/
+
+# D1 backups (contains user data — never commit)
+/backups/
