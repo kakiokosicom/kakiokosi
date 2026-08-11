@@ -4,6 +4,40 @@
 **目的:** Worker + D1 を Humanadsai アカウントから kakiokosi.com ゾーンのあるアカウントへ移し、ねじれ構造を解消する
 **状態:** 2026-07-07 13:40 — **Phase 3 カットオーバー完了（本番は新アカウント配信中）**。残り: Phase 4 後片付け（7/10以降）と、必要になった時のSecrets投入（下記）
 
+## 認証：`scripts/cf.sh` を使う（2026-08-11 確立）
+
+新アカウントへの wrangler 操作は、**必ず `scripts/cf.sh` 経由**で行う。
+
+```bash
+bash scripts/cf.sh d1 execute kakiokosi-db --remote --command "SELECT 1"
+bash scripts/cf.sh d1 execute kakiokosi-db --remote --file migrations/00XX_....sql
+bash scripts/cf.sh deploy
+```
+
+**なぜラッパーが要るか（実際に起きた障害）:** `CLOUDFLARE_API_TOKEN` をシェルのプロファイルでグローバルに export していると、別アカウントのプロジェクトにも同じトークンが効く。7/7 のカットオーバー後も `~/.zshenv` と `~/.zshrc` の**両方**に旧 Humanadsai のトークンが残っていた（重複しているので片方だけ直しても効かない）ため、本番 D1 への問い合わせが `code: 7404 database not found` で全滅し、`env -u CLOUDFLARE_API_TOKEN` の OAuth フォールバックも失効していた。結果、キュー補充が実行できないまま 7/22 以降のcronが7回連続で空撃ちし、サイトが23日間更新停止した（0044 で復旧）。
+
+`cf.sh` は継承した `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` を必ず unset してから、このプロジェクト専用の認証ファイルだけを読む。アカウント取り違えが構造的に起きない。
+
+**セットアップ（1回だけ）:**
+
+```bash
+mkdir -p ~/.config/cloudflare
+printf 'CLOUDFLARE_API_TOKEN=<token>\n' > ~/.config/cloudflare/kakiokosi.env
+chmod 600 ~/.config/cloudflare/kakiokosi.env
+```
+
+トークンは **info@kakiokosi.com アカウント**で発行し、権限は以下に絞る:
+
+| 種別 | 権限 | レベル |
+|---|---|---|
+| Account | Workers Scripts | Edit |
+| Account | D1 | Edit |
+| Account | Account Settings | Read |
+| Zone (kakiokosi.com) | Workers Routes | Edit |
+| Zone (kakiokosi.com) | Zone | Read |
+
+**やってはいけないこと:** `~/.zshrc` / `~/.zshenv` へのグローバル export（上記の障害の原因）。プロジェクトの `.env` に置くのも不可 — wrangler の `.env` サポートは Worker のローカル実行時の変数用で、wrangler 自身の認証には効かない。
+
 ## Phase 3 実施記録（2026-07-07 13:35 JST）
 
 - Secrets 3件（ANTHROPIC_API_KEY / GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET）は**投入せずにカットオーバー**。使用箇所を確認した結果、前者=dashboardのAI執筆（現運用はClaude Code直接執筆で不使用）、後者=dashboardのGoogleログインのみで、公開サイト・cron・IndexNowは非依存。**dashboardログインを使う時に `env -u CLOUDFLARE_API_TOKEN npx wrangler secret put GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET` を投入すること**
@@ -11,7 +45,7 @@
 - カットオーバー前差分チェック: 旧D1 max(updated_at)=07-07 09:00:27（バックアップ09:47より前）で差分ゼロ → 再インポート省略
 - 検証済み: 本番 root 200 / http→https 301 / www→apex 301 / sitemap 104 / 記事200+schema / 404、`wrangler tail` でマーク付きリクエストが新Worker到達を確認
 - 副次効果: workers.dev は自動無効化（404、重複ホスト解消）。**ゾーン側誤301も解消** — 光の道対談-4 が worker側マップの正しい /share/business/286 に1ホップで到達（付録1は完了扱い）
-- wranglerの罠: 旧アカウントのトークンでコマンドを実行すると `node_modules/.cache/wrangler/wrangler-account.json` にaccount_idがキャッシュされ、以後のOAuth実行が旧アカウントに向く。**新アカウント操作は `CLOUDFLARE_ACCOUNT_ID=8798d5a0bf5bab82c8f0d1e3a9087374` を明示**
+- wranglerの罠: 旧アカウントのトークンでコマンドを実行すると `node_modules/.cache/wrangler/wrangler-account.json` にaccount_idがキャッシュされ、以後のOAuth実行が旧アカウントに向く。**新アカウント操作は `CLOUDFLARE_ACCOUNT_ID=8798d5a0bf5bab82c8f0d1e3a9087374` を明示**（→ 2026-08-11 以降は上記「認証：`scripts/cf.sh` を使う」に集約。cf.sh がこのIDを既定で渡す）
 
 ## Phase 2 実施記録（2026-07-07）
 
