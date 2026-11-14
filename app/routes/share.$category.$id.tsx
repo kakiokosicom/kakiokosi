@@ -137,15 +137,16 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
     CATEGORY_LABELS_EN[post.primary_category] ?? post.primary_category;
 
   const articleUrl = `https://kakiokosi.com/share/${post.primary_category}/${post.id}`;
-  // 出典(原典)のURLと、その実体に応じた schema.org 型。
-  // youtube/ted=VideoObject、voicy/spotify=AudioObject、その他(記事/PDF等)=CreativeWork。
+  // 動画は出典URLとして参照し、動画メタデータのない VideoObject は宣言しない。
+  // voicy/spotify=AudioObject、その他(記事/PDF等)=CreativeWork は維持する。
   const sourceUrl = post.source_url || post.voicy_url || post.spotify_url || null;
-  const sourceType = sourceUrl
+  const sourceReference = sourceUrl
     ? /youtube\.com|youtu\.be|ted\.com/.test(sourceUrl)
-      ? "VideoObject"
-      : /voicy\.jp|spotify\.com/.test(sourceUrl)
-        ? "AudioObject"
-        : "CreativeWork"
+      ? sourceUrl
+      : {
+          "@type": /voicy\.jp|spotify\.com/.test(sourceUrl) ? "AudioObject" : "CreativeWork",
+          url: sourceUrl,
+        }
     : null;
   const jsonLd = {
     "@context": "https://schema.org",
@@ -171,8 +172,8 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
             url: "https://kakiokosi.com/images/default-og.png",
           },
         },
-        ...(sourceUrl
-          ? { isBasedOn: { "@type": sourceType, url: sourceUrl } }
+        ...(sourceReference
+          ? { isBasedOn: sourceReference }
           : {}),
         // 元の講演・インタビューで話した人を Wikidata 紐付き Person として明示
         ...(speakerAbout(post.id).length > 0
